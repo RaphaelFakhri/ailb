@@ -1,0 +1,10 @@
+name = "ailb"
+compatibility_date = "2026-06-01"
+pages_build_output_dir = "public"
+
+[vars]
+RELAY_URL = "https://ailb-relay.symbai.dev"
+
+[[kv_namespaces]]
+binding = "SESSIONS"
+id = "7a5ffab6a07e47048c20e0eb76d31f46"
