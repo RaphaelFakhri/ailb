@@ -1,0 +1,35 @@
+---
+// ailb wordmark — lowercase bold "ailb" with a gold dot, rendered as a
+// text-based SVG (src/assets/ailb-wordmark.svg). The file is inlined here
+// (Vite `?raw` import) so `fill="currentColor"` inside the SVG picks up
+// the parent's CSS color, and the <text> element picks up the Satoshi 900
+// face loaded by the Base layout.
+//
+// Size is controlled by the parent's `font-size` (via the `em` height)
+// or by passing a `height` prop in px.
+import svgSource from "../assets/ailb-wordmark.svg?raw";
+
+interface Props {
+  height?: number;
+  class?: string;
+}
+
+const { height, class: klass = "" } = Astro.props;
+const heightStyle = height ? `${height}px` : "1em";
+---
+
+<span
+  class={`inline-block align-middle select-none ${klass}`}
+  style={`height: ${heightStyle}; line-height: 1;`}
+  aria-label="ailb"
+  role="img"
+>
+  <Fragment set:html={svgSource} />
+  <style>
+    span > :global(svg) {
+      height: 100%;
+      width: auto;
+      display: block;
+    }
+  </style>
+</span>

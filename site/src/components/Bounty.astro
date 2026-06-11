@@ -1,0 +1,172 @@
+---
+// GOVERNMENT pillar — mirrors the THINGS section's structure. Pink palette.
+// Honest concierge framing: the agent preps the file, tracks validity
+// windows, and sequences dependencies so you go once, with everything.
+// All dimensions held in lockstep with the sibling sections. Imagery is
+// placeholder.
+import { Image } from "astro:assets";
+import engineerMale from "../assets/sidekick/engineer-male.png";
+import engineerFemale from "../assets/sidekick/engineer-female.png";
+import workspace from "../assets/sidekick/workspace.png";
+
+const bullets = [
+  "Live requirements — not oral tradition",
+  "Document checklist + prefilled forms",
+  "Validity-window tracking on every paper",
+  "Dependency sequencing, in the right order",
+  "Appointment plans for one clean visit",
+];
+---
+
+<section
+  id="government"
+  class="relative flex flex-col items-center"
+  style="padding: 80px 30px 120px; background-color: #faf9f7;"
+  aria-label="Government services"
+>
+  <div
+    aria-hidden="true"
+    class="pointer-events-none absolute"
+    style="top: 80px; left: calc(50% - 499px); width: 998px; height: 472px; border-radius: 100%; background-color: #f2e6ec; opacity: 0.45; filter: blur(50px); z-index: 0;"
+  ></div>
+
+  <div
+    class="sk-container relative z-10 w-full flex flex-wrap items-start justify-center"
+    style="max-width: 1120px; padding: 0 30px; gap: 50px;"
+  >
+    <!-- Upper row -->
+    <div class="sk-row w-full flex flex-row items-start" style="gap: 40px;">
+      <!-- LEFT column -->
+      <div class="sk-left flex flex-col items-start" style="gap: 30px; width: 370px; flex-shrink: 0;">
+        <div class="relative w-full overflow-hidden self-stretch" style="height: 490px;">
+          <div
+            aria-hidden="true"
+            class="absolute left-0 right-0 bottom-0"
+            style="height: 335px; border-radius: 50px; background-color: #f2e6ec;"
+          ></div>
+          <div
+            class="absolute top-0 left-1/2 -translate-x-1/2 flex flex-col items-center justify-end"
+            style="width: 97%; height: 100%;"
+          >
+            <Image
+              src={workspace}
+              alt="Placeholder imagery"
+              width={619}
+              height={823}
+              loading="lazy"
+              class="sk-photoimg block w-full h-full object-cover object-top"
+              style="aspect-ratio: 0.7521; border-radius: 40px;"
+            />
+          </div>
+        </div>
+
+        <div class="flex flex-col items-start self-stretch" style="padding: 0 20px; gap: 14px;">
+          <h4
+            class="sk-listhead text-[#1a1a1a] font-semibold"
+            style="font-family: var(--font-display); font-size: 22px; line-height: 32px; letter-spacing: -0.02em;"
+          >
+            Your guided file:
+          </h4>
+          <ul class="w-full grid gap-[10px]" style="grid-template-columns: 1fr;">
+            {bullets.map((b) => (
+              <li class="flex flex-row items-center" style="gap: 10px;">
+                <svg
+                  class="shrink-0"
+                  width="23" height="23" viewBox="0 0 23 23"
+                  aria-hidden="true"
+                ><path d="M 11.141 1 C 5.538 1 1 5.538 1 11.141 C 1 16.745 5.538 21.283 11.141 21.283 C 16.745 21.283 21.283 16.745 21.283 11.141 C 21.283 5.538 16.745 1 11.141 1 Z M 16.947 8.885 L 10.634 15.198 C 10.406 15.426 10.077 15.578 9.747 15.578 C 9.417 15.578 9.087 15.426 8.86 15.198 L 5.336 11.674 C 4.829 11.167 4.829 10.381 5.336 9.874 C 5.843 9.367 6.629 9.367 7.136 9.874 L 9.748 12.485 L 15.148 7.085 C 15.655 6.578 16.441 6.578 16.948 7.085 C 17.454 7.592 17.454 8.403 16.947 8.885 Z" fill="#8a3a5f"/></svg>
+                <span
+                  class="text-[#1a1a1a]"
+                  style="font-family: var(--font-body); font-size: 14px; font-weight: 500; line-height: 1.4em;"
+                >
+                  {b}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <a
+            href="https://wa.me/96178720415?text=Hi%20ailb"
+            class="sk-cta2 items-center justify-center text-white hover:opacity-95 transition-opacity"
+            style="height: 43px; padding: 0 50px; border-radius: 500px; background-color: #8a3a5f; font-family: var(--font-body); font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; line-height: 1.2em; width: fit-content; margin-top: 16px;"
+          >
+            Start a File
+          </a>
+        </div>
+      </div>
+
+      <!-- RIGHT column -->
+      <div class="sk-right flex flex-col items-start" style="flex: 1 0 0; padding-top: 50px; gap: 30px;">
+        <div class="w-full flex flex-col items-start" style="gap: 12px;">
+          <h6
+            class="text-[#1a1a1a]"
+            style="font-size: 10px; font-weight: 500; line-height: 1.5em; letter-spacing: 0.16em; text-transform: uppercase;"
+          >
+            Pillar three &mdash; government services
+          </h6>
+          <h2
+            class="sk-h2 text-[#1a1a1a] font-semibold"
+            style="font-family: var(--font-display); font-size: 50px; line-height: 1.2em; letter-spacing: -0.02em;"
+          >
+            Go once, <span style="color: #8a3a5f;">with everything</span>
+          </h2>
+        </div>
+
+        <div class="sk-pair relative w-full overflow-hidden" style="height: 498px;">
+          <div
+            class="sk-pair-b absolute overflow-hidden"
+            style="width: 306px; height: 452px; border-radius: 20px; top: 0; right: 0;"
+          >
+            <Image
+              src={engineerFemale}
+              alt="Placeholder imagery"
+              width={604}
+              height={892}
+              loading="lazy"
+              class="block w-full h-full object-cover"
+            />
+          </div>
+          <div
+            class="sk-pair-a absolute overflow-hidden"
+            style="width: 306px; height: 452px; border-radius: 20px; left: 0; bottom: 0;"
+          >
+            <Image
+              src={engineerMale}
+              alt="Placeholder imagery"
+              width={604}
+              height={892}
+              loading="lazy"
+              class="block w-full h-full object-cover"
+            />
+          </div>
+        </div>
+
+        <div class="w-full flex flex-col" style="padding-top: 20px; gap: 26px;">
+          <h3
+            class="sk-h3 text-[#1a1a1a] font-semibold"
+            style="font-family: var(--font-display); font-size: 30px; line-height: 1.2em; letter-spacing: -0.02em;"
+          >
+            Your ikhraj qaid expires before your TLS appointment.
+          </h3>
+          <p
+            class="sk-copy text-[#545454]"
+            style="font-family: var(--font-body); font-size: 14px; line-height: 1.6em;"
+          >
+            The agent knows &mdash; so it tells you to renew first. Live
+            requirements instead of oral tradition, a checklist and
+            prefilled forms, and a plan for the exact order of stamps so
+            nobody bounces you. ailb doesn't replace the mukhtar &mdash;
+            it makes sure you go once, with everything.
+          </p>
+          <a
+            href="https://wa.me/96178720415?text=Hi%20ailb"
+            class="sk-cta1 inline-flex items-center justify-center text-white hover:opacity-95 transition-opacity"
+            style="height: 46px; padding: 0 28px; border-radius: 500px; background-color: #8a3a5f; font-family: var(--font-body); font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; width: fit-content;"
+          >
+            Start a File
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>

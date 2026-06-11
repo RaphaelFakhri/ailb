@@ -1,0 +1,515 @@
+---
+// Web chat widget + WhatsApp-code login modal. Ported from the original
+// vanilla site (public/app.js + index.html) and restyled to match the
+// site's design language (Red Hat Text, pill buttons, light surfaces,
+// navy #1d386a primary, gold #f2c84b accent).
+//
+// API contract (Pages Functions in site/functions/ — do not change):
+//   POST /api/login/request {phone}
+//   POST /api/login/verify  {phone, code} -> {token, phone}
+//   POST /api/chat          {message}  (Authorization: Bearer <token>)
+//   GET  /api/me            -> {phone}
+// Token lives in localStorage "ailb_token"; a 401 reopens the login modal.
+//
+// Opening the chat from anywhere:
+//   - any element with [data-open-chat]
+//   - window.ailbChat.open()
+//   - document.dispatchEvent(new CustomEvent("ailb:open-chat"))
+---
+
+<!-- floating chat button -->
+<button id="chat-fab" class="cw-fab" type="button" data-open-chat aria-label="Open web chat">💬</button>
+
+<!-- CHAT PANEL -->
+<section id="chat-panel" class="cw-panel cw-hidden" aria-label="ailb web chat" role="dialog" aria-modal="false">
+  <header class="cw-head">
+    <div class="cw-head-id">
+      <strong>ailb<span class="cw-dot">.</span></strong>
+      <span class="cw-subtitle">same agent as WhatsApp</span>
+    </div>
+    <div class="cw-head-actions">
+      <button id="chat-logout" class="cw-logout cw-hidden" type="button">log out</button>
+      <button id="chat-close" class="cw-icon-btn" type="button" aria-label="Close chat">✕</button>
+    </div>
+  </header>
+  <div id="chat-messages" class="cw-messages" aria-live="polite"></div>
+  <form id="chat-form" class="cw-input-row">
+    <label class="cw-visually-hidden" for="chat-input">Message</label>
+    <textarea id="chat-input" rows="1" placeholder="Tell ailb what you need…" maxlength="4000" required></textarea>
+    <button class="cw-send" type="submit" aria-label="Send">
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M3 11.5 21 3l-8.5 18-2.3-7.2L3 11.5Z"/></svg>
+    </button>
+  </form>
+</section>
+
+<!-- LOGIN MODAL -->
+<div id="login-modal" class="cw-backdrop cw-hidden" role="dialog" aria-modal="true" aria-labelledby="login-title">
+  <div class="cw-modal">
+    <button id="login-close" class="cw-icon-btn cw-modal-close" type="button" aria-label="Close">✕</button>
+
+    <div id="login-step-phone">
+      <h2 id="login-title">Log in with WhatsApp</h2>
+      <p class="cw-modal-sub">ailb will WhatsApp you a 6-digit code from <strong>+961&nbsp;78&nbsp;720&nbsp;415</strong>. New here? Same step — your first login creates your account.</p>
+      <form id="phone-form">
+        <label for="phone-input">Phone number</label>
+        <div class="cw-phone-row">
+          <span class="cw-cc" aria-hidden="true">+961</span>
+          <input id="phone-input" type="tel" inputmode="tel" autocomplete="tel" placeholder="03 123 456" required>
+        </div>
+        <p id="phone-error" class="cw-form-error" role="alert"></p>
+        <button class="cw-pill cw-pill-primary cw-block" type="submit">Send me a code on WhatsApp</button>
+      </form>
+    </div>
+
+    <div id="login-step-code" class="cw-hidden">
+      <h2>Enter your code</h2>
+      <p class="cw-modal-sub">We sent a 6-digit code to <strong id="code-phone-label"></strong> on WhatsApp. Valid 10 minutes.</p>
+      <form id="code-form">
+        <label for="code-input">6-digit code</label>
+        <input id="code-input" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="\d{6}" maxlength="6" placeholder="••••••" required>
+        <p id="code-error" class="cw-form-error" role="alert"></p>
+        <button class="cw-pill cw-pill-primary cw-block" type="submit">Verify &amp; log in</button>
+        <button id="code-back" class="cw-pill cw-pill-ghost cw-block" type="button">Use a different number</button>
+      </form>
+    </div>
+
+    <p class="cw-modal-note">WhatsApp only — your number is never shown to buyers or sellers.</p>
+  </div>
+</div>
+
+<!-- Global (not scoped): the chat JS creates .cw-msg nodes at runtime,
+     which Astro's scoped styles wouldn't match. All classes are cw-prefixed. -->
+<style is:global>
+  .cw-hidden { display: none !important; }
+  .cw-visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  /* FAB */
+  .cw-fab {
+    position: fixed; right: 16px; bottom: 16px; z-index: 150;
+    width: 56px; height: 56px; border-radius: 50%;
+    background: #1d386a; border: none; font-size: 24px; cursor: pointer;
+    box-shadow: 0 6px 24px rgba(8, 15, 28, 0.35);
+    transition: transform 200ms cubic-bezier(0.3, 1.05, 0.4, 1.02);
+  }
+  .cw-fab:hover { transform: translateY(-2px); }
+
+  /* Panel */
+  .cw-panel {
+    position: fixed; inset: 0; z-index: 160;
+    display: flex; flex-direction: column;
+    background: #ffffff; color: #1a1a1a;
+    font-family: var(--font-body, "Red Hat Text", ui-sans-serif, system-ui, sans-serif);
+  }
+  .cw-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 16px; border-bottom: 1px solid #e8e6e1; background: #faf9f7;
+  }
+  .cw-head-id strong {
+    font-family: Satoshi, var(--font-display, sans-serif);
+    font-weight: 900; font-size: 18px; letter-spacing: -0.02em;
+  }
+  .cw-dot { color: #f2c84b; }
+  .cw-subtitle { color: #545454; font-size: 12.5px; margin-left: 8px; }
+  .cw-head-actions { display: flex; align-items: center; gap: 10px; }
+  .cw-logout {
+    background: none; border: none; cursor: pointer;
+    color: #545454; font: inherit; font-size: 12.5px; text-decoration: underline;
+  }
+  .cw-icon-btn {
+    background: transparent; border: 1px solid #ddd; border-radius: 500px;
+    color: #545454; font-size: 14px; width: 34px; height: 34px; cursor: pointer;
+  }
+  .cw-icon-btn:hover { color: #1a1a1a; border-color: #1d386a; }
+
+  .cw-messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .cw-msg {
+    max-width: 82%; padding: 10px 14px; border-radius: 16px;
+    font-size: 14.5px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: break-word;
+  }
+  .cw-msg-user { align-self: flex-end; background: #1d386a; color: #fff; border-bottom-right-radius: 5px; }
+  .cw-msg-agent { align-self: flex-start; background: #faf9f7; border: 1px solid #e8e6e1; border-bottom-left-radius: 5px; }
+  .cw-msg-system { align-self: center; color: #545454; font-size: 12.5px; background: transparent; text-align: center; }
+  .cw-msg-typing { align-self: flex-start; color: #545454; font-size: 13px; font-style: italic; }
+  .cw-msg-typing .cw-dots::after { content: "…"; animation: cw-blink 1.2s infinite; }
+  @keyframes cw-blink { 50% { opacity: 0.3; } }
+
+  .cw-input-row { display: flex; gap: 8px; padding: 12px 14px; border-top: 1px solid #e8e6e1; background: #faf9f7; }
+  .cw-input-row textarea {
+    flex: 1; resize: none; font: inherit; font-size: 15px;
+    background: #ffffff; color: #1a1a1a;
+    border: 1px solid #ddd; border-radius: 20px; padding: 10px 16px;
+    max-height: 120px;
+  }
+  .cw-input-row textarea:focus { outline: none; border-color: #1d386a; }
+  .cw-send {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 0 18px; border: none; border-radius: 500px; cursor: pointer;
+    background: #1d386a; color: #fff;
+    transition: opacity 0.2s ease;
+  }
+  .cw-send:hover { opacity: 0.92; }
+
+  /* Pills (match the site's CTA language) */
+  .cw-pill {
+    display: inline-flex; align-items: center; justify-content: center;
+    height: 43px; padding: 0 28px; border-radius: 500px; border: none; cursor: pointer;
+    font-family: var(--font-body, sans-serif); font-size: 12px; font-weight: 600;
+    letter-spacing: 0.05em; text-transform: uppercase;
+    transition: opacity 0.2s ease;
+  }
+  .cw-pill-primary { background: #1d386a; color: #ffffff; }
+  .cw-pill-primary:hover { opacity: 0.92; }
+  .cw-pill-primary:disabled { opacity: 0.6; cursor: default; }
+  .cw-pill-ghost { background: transparent; color: #545454; }
+  .cw-pill-ghost:hover { color: #1a1a1a; }
+  .cw-block { width: 100%; margin-top: 10px; }
+
+  /* Login modal */
+  .cw-backdrop {
+    position: fixed; inset: 0; z-index: 170;
+    background: rgba(8, 15, 28, 0.55);
+    display: flex; align-items: flex-end; justify-content: center;
+    font-family: var(--font-body, "Red Hat Text", ui-sans-serif, system-ui, sans-serif);
+  }
+  .cw-modal {
+    position: relative; width: 100%; max-width: 420px;
+    background: #ffffff; color: #1a1a1a;
+    border-radius: 20px 20px 0 0; padding: 26px 22px 22px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.18);
+  }
+  .cw-modal h2 {
+    margin: 0 0 8px; font-size: 22px; font-weight: 600; letter-spacing: -0.02em;
+    font-family: var(--font-display, sans-serif);
+  }
+  .cw-modal-sub { color: #545454; font-size: 14px; line-height: 1.6em; margin: 0 0 18px; }
+  .cw-modal-close { position: absolute; top: 14px; right: 14px; }
+  .cw-modal label {
+    display: block; font-size: 10px; font-weight: 500; color: #545454;
+    margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.16em;
+  }
+  .cw-modal input {
+    width: 100%; box-sizing: border-box; font: inherit; font-size: 17px;
+    background: #faf9f7; color: #1a1a1a;
+    border: 1px solid #ddd; border-radius: 14px; padding: 11px 13px;
+  }
+  .cw-modal input:focus { outline: none; border-color: #1d386a; }
+  .cw-phone-row { display: flex; gap: 8px; align-items: stretch; }
+  .cw-cc {
+    display: flex; align-items: center; padding: 0 12px;
+    background: #faf9f7; border: 1px solid #ddd; border-radius: 14px;
+    color: #545454; font-weight: 600; font-size: 15px;
+  }
+  #code-input { text-align: center; letter-spacing: 0.5em; font-size: 22px; font-weight: 600; }
+  .cw-form-error { color: #b4434f; font-size: 13px; min-height: 18px; margin: 8px 0 2px; }
+  .cw-modal-note { color: #545454; font-size: 12px; text-align: center; margin: 16px 0 0; }
+
+  @media (min-width: 720px) {
+    .cw-panel {
+      inset: auto 24px 24px auto; width: 400px; height: min(620px, calc(100vh - 48px));
+      border: 1px solid #e8e6e1; border-radius: 20px; overflow: hidden;
+      box-shadow: 0 16px 56px rgba(8, 15, 28, 0.25);
+    }
+    .cw-backdrop { align-items: center; padding: 20px; }
+    .cw-modal { border-radius: 20px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cw-fab, .cw-msg-typing .cw-dots::after { animation: none !important; transition: none !important; }
+  }
+</style>
+
+<script is:inline>
+/* ailb — chat + WhatsApp-code login. No deps. */
+(function () {
+  "use strict";
+
+  var TOKEN_KEY = "ailb_token";
+  var PHONE_KEY = "ailb_phone";
+
+  // ---------- helpers ----------
+  function $(id) { return document.getElementById(id); }
+
+  function getToken() { return localStorage.getItem(TOKEN_KEY); }
+  function setSession(token, phone) {
+    localStorage.setItem(TOKEN_KEY, token);
+    if (phone) localStorage.setItem(PHONE_KEY, phone);
+    renderAuth();
+  }
+  function clearSession() {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(PHONE_KEY);
+    renderAuth();
+  }
+
+  // Normalize Lebanese / international numbers to digits like "96178720415".
+  function normalizePhone(raw) {
+    var d = String(raw || "").replace(/\D/g, "");
+    if (d.indexOf("00") === 0) d = d.slice(2);
+    if (d.indexOf("961") === 0 && d.length >= 10) return d;
+    if (d.charAt(0) === "0" && d.length === 8) return "961" + d.slice(1);
+    if (d.length === 7 || d.length === 8) return "961" + d;
+    if (d.length >= 10 && d.length <= 15) return d;
+    return null;
+  }
+
+  // fetch wrapper that never throws on bad JSON
+  function api(path, opts) {
+    opts = opts || {};
+    var headers = { "content-type": "application/json" };
+    var token = getToken();
+    if (token) headers["authorization"] = "Bearer " + token;
+    return fetch(path, {
+      method: opts.method || (opts.body ? "POST" : "GET"),
+      headers: headers,
+      body: opts.body ? JSON.stringify(opts.body) : undefined
+    }).then(function (res) {
+      return res.text().then(function (text) {
+        var data = null;
+        try { data = JSON.parse(text); } catch (e) { /* non-JSON body */ }
+        return { status: res.status, ok: res.ok, data: data || {} };
+      });
+    });
+  }
+
+  // ---------- auth UI ----------
+  var logoutBtn = $("chat-logout");
+
+  function renderAuth() {
+    if (getToken()) logoutBtn.classList.remove("cw-hidden");
+    else logoutBtn.classList.add("cw-hidden");
+  }
+
+  logoutBtn.addEventListener("click", function () {
+    clearSession();
+    addMsg("system", "Logged out. Your chat history on WhatsApp is untouched.");
+  });
+
+  // validate token quietly on load
+  if (getToken()) {
+    api("/api/me").then(function (r) {
+      if (r.status === 401) clearSession();
+      else if (r.ok && r.data.phone) localStorage.setItem(PHONE_KEY, r.data.phone);
+      renderAuth();
+    }).catch(function () { /* offline — keep optimistic */ });
+  }
+
+  // ---------- chat panel ----------
+  var chatPanel = $("chat-panel");
+  var chatMessages = $("chat-messages");
+  var chatForm = $("chat-form");
+  var chatInput = $("chat-input");
+  var chatFab = $("chat-fab");
+  var pendingMessage = null; // message waiting for login
+  var greeted = false;
+
+  function openChat() {
+    chatPanel.classList.remove("cw-hidden");
+    chatFab.classList.add("cw-hidden");
+    if (!greeted) {
+      greeted = true;
+      addMsg("agent", "Ahla! I'm ailb — same agent as on WhatsApp.\nSell something, find someone, or start a paperwork file. Shu badak?");
+    }
+    chatInput.focus();
+  }
+  function closeChat() {
+    chatPanel.classList.add("cw-hidden");
+    chatFab.classList.remove("cw-hidden");
+  }
+
+  document.querySelectorAll("[data-open-chat]").forEach(function (el) {
+    el.addEventListener("click", openChat);
+  });
+  document.addEventListener("ailb:open-chat", openChat);
+  window.ailbChat = { open: openChat, close: closeChat };
+  $("chat-close").addEventListener("click", closeChat);
+
+  function addMsg(kind, text) {
+    var div = document.createElement("div");
+    div.className = "cw-msg cw-msg-" + kind;
+    div.textContent = text;
+    chatMessages.appendChild(div);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    return div;
+  }
+
+  function showTyping() {
+    var div = document.createElement("div");
+    div.className = "cw-msg cw-msg-typing";
+    div.innerHTML = 'ailb is working<span class="cw-dots"></span>';
+    chatMessages.appendChild(div);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    var slowTimer = setTimeout(function () {
+      div.innerHTML = 'still working — the agent actually does things<span class="cw-dots"></span>';
+    }, 5000);
+    return function remove() {
+      clearTimeout(slowTimer);
+      if (div.parentNode) div.parentNode.removeChild(div);
+    };
+  }
+
+  function sendMessage(text) {
+    if (!getToken()) {
+      pendingMessage = text;
+      openLogin();
+      return;
+    }
+    addMsg("user", text);
+    var stopTyping = showTyping();
+    api("/api/chat", { body: { message: text } }).then(function (r) {
+      stopTyping();
+      if (r.status === 401) {
+        clearSession();
+        pendingMessage = text;
+        addMsg("system", "Your session expired — log in again and I'll resend that.");
+        openLogin();
+        return;
+      }
+      if (r.ok && r.data.reply) {
+        addMsg("agent", String(r.data.reply));
+      } else {
+        addMsg("system", "Couldn't reach the agent (" + (r.data.error || r.status) + "). It might be mid-errand — try sending again.");
+      }
+    }).catch(function () {
+      stopTyping();
+      addMsg("system", "Network hiccup — check your connection and try again.");
+    });
+  }
+
+  chatForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var text = chatInput.value.trim();
+    if (!text) return;
+    chatInput.value = "";
+    chatInput.style.height = "auto";
+    sendMessage(text);
+  });
+
+  // Enter sends, Shift+Enter = newline; textarea auto-grows
+  chatInput.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      chatForm.requestSubmit();
+    }
+  });
+  chatInput.addEventListener("input", function () {
+    chatInput.style.height = "auto";
+    chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + "px";
+  });
+
+  // ---------- login modal ----------
+  var loginModal = $("login-modal");
+  var stepPhone = $("login-step-phone");
+  var stepCode = $("login-step-code");
+  var phoneForm = $("phone-form");
+  var phoneInput = $("phone-input");
+  var phoneError = $("phone-error");
+  var codeForm = $("code-form");
+  var codeInput = $("code-input");
+  var codeError = $("code-error");
+  var codePhoneLabel = $("code-phone-label");
+  var currentPhone = null; // normalized digits
+
+  function openLogin() {
+    loginModal.classList.remove("cw-hidden");
+    stepPhone.classList.remove("cw-hidden");
+    stepCode.classList.add("cw-hidden");
+    phoneError.textContent = "";
+    codeError.textContent = "";
+    phoneInput.focus();
+  }
+  function closeLogin() {
+    loginModal.classList.add("cw-hidden");
+    pendingMessage = null;
+  }
+
+  $("login-close").addEventListener("click", closeLogin);
+  loginModal.addEventListener("click", function (e) {
+    if (e.target === loginModal) closeLogin();
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && !loginModal.classList.contains("cw-hidden")) closeLogin();
+  });
+
+  $("code-back").addEventListener("click", function () {
+    stepCode.classList.add("cw-hidden");
+    stepPhone.classList.remove("cw-hidden");
+    phoneInput.focus();
+  });
+
+  phoneForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    phoneError.textContent = "";
+    var normalized = normalizePhone(phoneInput.value);
+    if (!normalized) {
+      phoneError.textContent = "That doesn't look like a phone number — try 03 123 456 or +961 71 881 367.";
+      return;
+    }
+    var btn = phoneForm.querySelector("button[type=submit]");
+    btn.disabled = true;
+    btn.textContent = "Sending…";
+    api("/api/login/request", { body: { phone: normalized } }).then(function (r) {
+      btn.disabled = false;
+      btn.textContent = "Send me a code on WhatsApp";
+      if (r.ok) {
+        currentPhone = normalized;
+        codePhoneLabel.textContent = "+" + normalized;
+        stepPhone.classList.add("cw-hidden");
+        stepCode.classList.remove("cw-hidden");
+        codeInput.value = "";
+        codeInput.focus();
+      } else if (r.status === 429) {
+        phoneError.textContent = "Easy — a code was just sent. Wait a minute, then try again.";
+      } else if (r.data.error === "invalid_phone") {
+        phoneError.textContent = "We couldn't use that number. Lebanese or international formats work.";
+      } else {
+        phoneError.textContent = "Couldn't send the code right now — try again in a moment.";
+      }
+    }).catch(function () {
+      btn.disabled = false;
+      btn.textContent = "Send me a code on WhatsApp";
+      phoneError.textContent = "Network hiccup — check your connection and try again.";
+    });
+  });
+
+  codeForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    codeError.textContent = "";
+    var code = codeInput.value.replace(/\D/g, "");
+    if (code.length !== 6) {
+      codeError.textContent = "The code is 6 digits.";
+      return;
+    }
+    var btn = codeForm.querySelector("button[type=submit]");
+    btn.disabled = true;
+    btn.textContent = "Verifying…";
+    api("/api/login/verify", { body: { phone: currentPhone, code: code } }).then(function (r) {
+      btn.disabled = false;
+      btn.textContent = "Verify & log in";
+      if (r.ok && r.data.token) {
+        setSession(r.data.token, r.data.phone || "+" + currentPhone);
+        loginModal.classList.add("cw-hidden");
+        var retry = pendingMessage;
+        pendingMessage = null;
+        if (retry) {
+          openChat();
+          sendMessage(retry);
+        }
+      } else if (r.data.error === "wrong_code") {
+        codeError.textContent = "Wrong code — check the WhatsApp message and try again.";
+      } else if (r.data.error === "expired") {
+        codeError.textContent = "That code expired. Go back and request a new one.";
+      } else if (r.status === 429) {
+        codeError.textContent = "Too many tries. Wait a bit, then request a fresh code.";
+      } else {
+        codeError.textContent = "Couldn't verify right now — try again.";
+      }
+    }).catch(function () {
+      btn.disabled = false;
+      btn.textContent = "Verify & log in";
+      codeError.textContent = "Network hiccup — try again.";
+    });
+  });
+
+  renderAuth();
+})();
+</script>

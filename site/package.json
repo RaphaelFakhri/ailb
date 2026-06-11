@@ -1,0 +1,23 @@
+{
+  "name": "ailb-site",
+  "type": "module",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.4",
+    "@tailwindcss/vite": "^4.1.3",
+    "astro": "^5.14.0",
+    "tailwindcss": "^4.1.3",
+    "typescript": "^5.7.2"
+  },
+  "devDependencies": {
+    "opentype.js": "^1.3.4",
+    "wrangler": "^4.86.0"
+  }
+}

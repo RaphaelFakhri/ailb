@@ -1,0 +1,266 @@
+@import "tailwindcss";
+
+/* Design tokens — warm, high-contrast, inspired by the MEDVi home palette. */
+@theme {
+  --color-bg: #ffffff;
+  --color-bg-card: #f1ebdf;
+  --color-ink: #1a1a1a;
+  --color-ink-soft: #5a5854;
+  --color-accent: #0d4d3a;
+  --color-accent-ink: #ffffff;
+  --color-sand: #e6dcc4;
+  --color-forest: #1f3a2e;
+  --color-berry: #a8485a;
+  --color-lemonade: #f2c84b;
+  --color-frozen: #a9cfdd;
+  --color-stone: #bfb8a8;
+
+  /* One family across body + headings. Weight contrast carries the
+     hierarchy — same single-family approach the reference uses. */
+  --font-display: "Red Hat Text", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Red Hat Text", ui-sans-serif, system-ui, sans-serif;
+
+  --radius-card: 1.75rem;
+  --radius-pill: 999px;
+}
+
+html {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-bg);
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+/* Scroll-reveal without JS: elements with [data-reveal] slide + fade in
+   once they enter the viewport, using CSS scroll-driven animations. */
+@supports (animation-timeline: view()) {
+  [data-reveal] {
+    animation: reveal linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 25%;
+  }
+  @keyframes reveal {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+}
+
+/* Horizontal marquee ticker. Kept here (not scoped inside an Astro
+   component) because Astro auto-hashes @keyframes names in scoped
+   styles, which breaks any utility class that references the literal
+   name. A global keyframe + a global class is the simplest way to
+   guarantee the animation actually binds. */
+@keyframes marquee-scroll {
+  from { transform: translate3d(0, 0, 0); }
+  /* Track holds 4 identical copies; -25% = exactly 1/4, lands the start
+     of copy 2 where copy 1 began. 25% is rational so there's no
+     sub-pixel drift per cycle. */
+  to   { transform: translate3d(-25%, 0, 0); }
+}
+
+.marquee-track {
+  /* medvi measured: 40px/s drift (track cycle 758px / 40) */
+  animation: marquee-scroll 37.9s linear infinite;
+  will-change: transform;
+}
+
+/* Site nav — three state machine: top / hidden / scrolled. Pulled out
+   of the utility class attribute because it otherwise emits hundreds
+   of bytes of cubic-bezier / duration arbitrary values inline AND
+   creates a bunch of unique Tailwind rules. Central definition is
+   cheaper to ship and easier to tweak. */
+.site-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  will-change: transform;
+  transition-property: transform, background-color, color, box-shadow, translate;
+  /* medvi's measured nav spring (fitted: 4.2% RMS vs their trajectory) */
+  transition-duration: 280ms;
+  transition-timing-function: cubic-bezier(0.3, 1.05, 0.4, 1.02);
+}
+.site-nav[data-state="top"] {
+  transform: translateY(0);
+  background-color: transparent;
+  color: #ffffff;
+}
+.site-nav[data-state="hidden"] {
+  transform: translateY(-100%);
+  background-color: transparent;
+  box-shadow: none;
+
+}
+.site-nav[data-state="scrolled"] {
+  transform: translateY(0);
+  background-color: #ffffff;
+  color: #1a1a1a;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
+}
+
+/* Page-load entrance animations — mirrors medvi's sequence:
+   1. Hero text "zooms in" (fades + scales up from 0.94) staggered
+      across eyebrow / h1 / paragraph.
+   2. Cards slide up a subtle 16px, staggered L→R:
+        Solo + Pod  → delay 0ms (simultaneous)
+        Rush         → delay 180ms
+        Bounty       → delay 360ms
+   3. Site nav drops down AFTER the hero beats (JS flips [data-state]
+      from hidden → top at ~900ms).
+   Same cubic-bezier as the nav transitions so the whole load reads
+   as one coordinated entrance. */
+/* Load sequence measured on medvi.org desktop:
+   - cards rise+fade FIRST (~350ms in, 20px, ~900ms, 150ms stagger
+     after the first pair)
+   - hero text follows at ~600ms with a zoom-OUT reveal: scale 1.2 -> 1
+     + fade, ~800ms, fast-start decel
+   - nav drops last (~900ms, handled by the site-nav state flip)
+   - the value-props ticker strip rises with the cards beat */
+@keyframes hero-zoom-out {
+  from { opacity: 0; transform: scale(1.2); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes card-rise {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.hero-enter {
+  animation: hero-zoom-out 800ms cubic-bezier(0.3, 0.6, 0.35, 1) both;
+}
+.hero-enter-1 { animation-delay: 600ms; }
+.hero-enter-2 { animation-delay: 660ms; }
+.hero-enter-3 { animation-delay: 600ms; }
+
+.card-enter {
+  animation: card-rise 900ms cubic-bezier(0.12, 0.23, 0.5, 1) both;
+}
+.card-enter-1 { animation-delay: 350ms; }   /* first pair together */
+.card-enter-2 { animation-delay: 350ms; }
+.card-enter-3 { animation-delay: 500ms; }
+.card-enter-4 { animation-delay: 650ms; }
+
+/* ticker strip joins the cards beat on load (medvi "Callouts") */
+.marquee-sec {
+  animation: card-rise 900ms cubic-bezier(0.12, 0.23, 0.5, 1) both;
+  animation-delay: 500ms;
+}
+
+/* Tablet carousel entrance (medvi, measured): every card — clones
+   included — rises and fades in on the SAME beat, no stagger, and the
+   value-props ticker below joins it. Overrides the staggered
+   card-enter delays. */
+@media (min-width: 810px) and (max-width: 1199.98px) {
+  .hero-cards > li {
+    animation: card-rise 900ms cubic-bezier(0.12, 0.23, 0.5, 1) both !important;
+    animation-delay: 500ms !important;
+  }
+  /* medvi tablet: the checklist runs in two columns */
+  .sk-left ul.grid { grid-template-columns: 1fr 1fr !important; }
+  /* medvi tablet: section copy is capped at 350px, not full column */
+  .sk-copy { max-width: 350px; }
+  /* medvi tablet: the dark band ends ~60px below the subtitle and the
+     carousel sits fully on white ~10px under the seam; ticker keeps a
+     ~50px gap below the cards */
+  .hero-sec { height: 510px !important; }
+  /* wordmark sits lower at tablet — medvi shows only ~79px of letter
+     tops above the seam */
+  .hero-wm { bottom: -302px !important; }
+  .marquee-sec {
+    animation-delay: 500ms;
+    margin-top: 250px;
+  }
+}
+
+
+/* ===== medvi responsive parity (tablet 810-1199.98, phone <=809.98) ===== */
+
+/* medvi pages never scroll horizontally at any width */
+html, body { overflow-x: clip; }
+
+/* Offering sections (Sidekick/Agents/Flash/Bounty share the sk-* classes).
+   Tiers measured on medvi.org: both sub-desktop tiers stack to one column
+   with the heading block first; tablet centers a 640px content column.
+   Inline desktop styles need !important to lose. */
+/* bottom CTA exists only below 1200 */
+.sk-cta2 { display: none; }
+
+@media (max-width: 1199.98px) {
+  .sk-row {
+    flex-direction: column !important;
+    /* medvi: 40px between the copy block and the product graphic */
+    gap: 40px !important;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+  .sk-left { order: 2; width: 100% !important; }
+  .sk-right { order: 1; padding-top: 0 !important; }
+  /* Flash/Bounty reuse the pop-out workspace asset whose TOP HALF is
+     transparent; in the wide stacked column object-top shows mostly
+     those blank pixels (reads as a huge margin above the laptop).
+     Anchor to the photo half instead. */
+  .sk-photoimg { object-position: bottom !important; }
+  /* medvi sub-desktop: the section CTA moves to the bottom of the
+     stacked section (after the checklist) as "Learn More" */
+  .sk-cta1 { display: none !important; }
+  .sk-cta2 { display: inline-flex; }
+  .sk-h2 { font-size: 40px !important; }
+  .sk-h3 { font-size: 24px !important; }
+  .sk-listhead { font-size: 20px !important; }
+  .sk-cards { flex-direction: column !important; }
+  .sk-card { flex: none !important; width: 100%; height: 150px !important; }
+  .sk-cardimg { width: 131px !important; }
+  .sk-cardsrow { max-width: 640px !important; margin: 0 auto; padding-top: 70px !important; }
+  /* green card height comes from the Sidekick clip script via --skcard-h */
+  .sk-greencard { height: var(--skcard-h, 335px) !important; }
+  .sk-graphic { height: var(--skwrap-h, 490px) !important; }
+  /* keep the laptop at desktop-graphic scale inside the wide stacked
+     column (it's w-full of its container otherwise) */
+  .sk-laptop { max-width: 400px; margin: 0 auto; }
+}
+
+@media (max-width: 809.98px) {
+  .sk-container { padding: 0 !important; }
+  .sk-h2 { font-size: 32px !important; }
+  .sk-h3 { font-size: 20px !important; }
+  .sk-listhead { font-size: 18px !important; }
+  /* image pair: side-by-side, bleeding past both edges like medvi
+     (left 237x350 starting -76px, right 233x310, 12px gap) */
+  .sk-pair {
+    height: 350px !important;
+    overflow: visible !important;
+  }
+  .sk-pair-a {
+    width: calc(50% + 41px) !important; height: 350px !important;
+    left: -46px !important; bottom: auto !important; top: 0 !important;
+  }
+  .sk-pair-b {
+    width: calc(50% + 41px) !important; height: 310px !important;
+    right: -46px !important; top: 0 !important;
+  }
+  /* medvi phone: only 30px between the image pair and the h3 — drop
+     the copy block's desktop padding-top */
+  .sk-right > div[style*="padding-top"] { padding-top: 0 !important; }
+  .sk-card { height: auto !important; min-height: 150px; }
+  /* h-full resolves against the now-auto card height, collapsing the
+     column — stretch it instead */
+  .sk-cardimg { width: 93px !important; height: auto !important; align-self: stretch; }
+  /* the scale-1.57 contain hack is desktop-tuned; in the narrow column
+     just cover like card 1 */
+  .sk-cardimg2 {
+    transform: none !important;
+    object-fit: cover !important;
+  }
+}

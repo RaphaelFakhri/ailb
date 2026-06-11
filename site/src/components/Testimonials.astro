@@ -1,0 +1,259 @@
+---
+// Testimonials band — 1:1 port of medvi's #testimonials (framer-ux6nyv).
+// All values measured live on medvi.org (2026-06-11, 1440px viewport):
+//
+//   section: padding 120px 0
+//   header column: max-width 580px, centered
+//     h6  eyebrow — 10px/15px/500/.16em/uppercase, #242220
+//     12px gap
+//     h2  — 50px/60px/600/-0.02em, renders 541px wide in the 580px col,
+//           wraps naturally (NO manual <br>), accent span green
+//     12px gap
+//     p   — 14px/22.4px, #242220, fills the 580px col, centered
+//   50px gap to rows
+//   two ticker rows, 20px apart, each 9 items + duplicate for loop:
+//     row A (sage #f1f5e9 cards):  photo, t, t, photo, t, t, t, photo, t
+//     row B (gray #fafafa cards):  t, photo, t, t, photo, t, t, photo, t
+//     row A scrolls LEFT at exactly 30px/s, row B RIGHT at 30px/s
+//     (medvi drives this with JS; speed sampled at -30.0/+30.0 px/s)
+//   card: 400x230 fixed, border-radius 20px, padding 40px
+//     top row: name (16px/20px/600, #38312c) left, 5 stars right
+//       (16x16, green #2e936f, 2px gap), 14px below quote
+//     quote: 14px/1.6em, #38312c — no avatar, no role line (medvi has none)
+//   photo card: 400x230, radius 20, img object-fit cover
+//
+// These are SCENARIOS from field research, not customer testimonials —
+// quotes voiced by the research personas we used to map 15 Lebanese
+// processes. A visible caption below the rows says so (honesty for
+// hackathon judges).
+type Testimonial = { name: string; quote: string };
+type Item = Testimonial | { img: string };
+
+const rowA: Item[] = [
+  { img: "/images/engineer-male.png" },
+  { name: "Karim, 34", quote: "Selling my Kia took six weeks of lowballers. ailb's pitch: one photo, qualified buyers only." },
+  { name: "Elie, 31 — electrician", quote: "My client list lives in other people's heads. ailb built my profile from a voice note." },
+  { img: "/images/workspace.png" },
+  { name: "Rana, 38", quote: "Water heater died; the agent got me a fixed quote before noon." },
+  { name: "Maya, 27", quote: "Third ikhraj qaid this year. Never again without the validity tracker." },
+  { name: "Nadim, 42", quote: "The mécanique transfer has an exact order of stamps. The agent knew it; I didn't." },
+  { img: "/images/squad.png" },
+  { name: "Joelle, 29", quote: "I asked for a Brevet math tutor in franco. It answered in franco — with three vetted options." },
+];
+
+const rowB: Item[] = [
+  { name: "Hady, 36", quote: "Thirty \u201csho akher si3er?\u201d messages for one couch. The agent answered every one of them." },
+  { img: "/images/engineer-female.png" },
+  { name: "Sara, 25", quote: "My Schengen file came back as a checklist with my bank letter already drafted." },
+  { name: "Tony, 48 — mover", quote: "I quote once, fixed. No bidding war in a Facebook group at midnight." },
+  { img: "/images/solo.original.png" },
+  { name: "Lina, 33", quote: "It told me my ikhraj qaid would expire before my TLS appointment — renew first. It was right." },
+  { name: "Omar, 39", quote: "Buying a used iPhone without the \u201cis the battery original?\u201d anxiety. The agent verified it." },
+  { img: "/images/sidekick.png" },
+  { name: "Rita, 30", quote: "I sent a voice note in 3arabe. It opened a paperwork file and listed my old fridge. Same chat." },
+];
+
+// Seamless loop needs content duplicated so the tail of sequence A
+// touches the head of its own duplicate mid-animation.
+const rowA2 = [...rowA, ...rowA];
+const rowB2 = [...rowB, ...rowB];
+
+const star =
+  "M 19.748 7.576 L 14.444 11.869 L 16.338 18.056 C 16.465 18.309 16.338 18.688 16.086 18.814 C 15.959 18.94 15.833 18.94 15.706 18.94 C 15.581 18.94 15.454 18.94 15.328 18.814 L 10.151 15.026 L 4.848 18.814 C 4.611 18.941 4.326 18.941 4.09 18.814 C 3.838 18.688 3.711 18.309 3.838 18.056 L 5.479 11.743 L 0.302 7.576 C 0.05 7.45 -0.077 7.071 0.05 6.819 C 0.176 6.566 0.428 6.313 0.68 6.313 L 7.373 6.313 L 9.393 0.505 C 9.52 0.253 9.773 0 10.025 0 C 10.277 0 10.53 0.253 10.656 0.505 L 12.676 6.313 L 19.369 6.313 C 19.621 6.313 19.874 6.566 20 6.819 C 20.126 7.071 20 7.45 19.748 7.576 Z";
+---
+
+<section
+  id="testimonials"
+  class="relative flex flex-col items-center"
+  style="padding: 120px 0; background-color: #ffffff; overflow: hidden;"
+  aria-label="Scenarios from our field research"
+>
+  <!-- Header column: 580px like medvi, natural wrap on the H2 -->
+  <div
+    class="w-full flex flex-col items-center"
+    style="max-width: 640px; padding: 0 30px; gap: 12px; box-sizing: border-box;"
+  >
+    <h6
+      class="text-center text-[#242220]"
+      style="font-family: var(--font-display); font-size: 10px; font-weight: 500; line-height: 1.5em; letter-spacing: 0.16em; text-transform: uppercase;"
+    >
+      Scenarios from our field research
+    </h6>
+    <h2
+      class="text-center text-[#242220] font-semibold"
+      style="font-family: var(--font-display); font-size: 50px; line-height: 60px; letter-spacing: -0.02em;"
+    >
+      We mapped <span style="color: #2e936f;">15 Lebanese processes</span>.
+    </h2>
+    <p
+      class="text-center text-[#242220]"
+      style="font-family: var(--font-body); font-size: 14px; line-height: 22.4px;"
+    >
+      Selling a car, onboarding an electrician, renewing an ikhraj qaid
+      &mdash; these scenarios come straight from our field research into
+      how life in Lebanon actually gets done.
+    </p>
+  </div>
+
+  <!-- Ticker rows: A left, B right, both exactly 30px/s like medvi -->
+  <div class="w-full flex flex-col" style="margin-top: 50px; gap: 20px;">
+    <div class="ticker-row" style="overflow-x: clip; display: flex;">
+      <ul class="ticker-track ticker-track-a" role="group">
+        {rowA2.map((item) => (
+          <li class="ticker-item">
+            {"img" in item ? (
+              <div class="t-photo"><img src={item.img} alt="" loading="lazy" /></div>
+            ) : (
+              <div class="t-card" style="background-color: #f1f5e9;">
+                <div class="t-card-top">
+                  <p class="t-name">{item.name}</p>
+                  <span class="t-stars" role="img" aria-label="5 stars">
+                    {Array.from({ length: 5 }).map(() => (
+                      <svg class="t-star" viewBox="0 0 24 24" aria-hidden="true"><path d={star} transform="translate(1.925 2.53)" /></svg>
+                    ))}
+                  </span>
+                </div>
+                <p class="t-quote">&ldquo;{item.quote}&rdquo;</p>
+              </div>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="ticker-row" style="overflow-x: clip; display: flex;">
+      <ul class="ticker-track ticker-track-b" role="group">
+        {rowB2.map((item) => (
+          <li class="ticker-item">
+            {"img" in item ? (
+              <div class="t-photo"><img src={item.img} alt="" loading="lazy" /></div>
+            ) : (
+              <div class="t-card" style="background-color: #fafafa;">
+                <div class="t-card-top">
+                  <p class="t-name">{item.name}</p>
+                  <span class="t-stars" role="img" aria-label="5 stars">
+                    {Array.from({ length: 5 }).map(() => (
+                      <svg class="t-star" viewBox="0 0 24 24" aria-hidden="true"><path d={star} transform="translate(1.925 2.53)" /></svg>
+                    ))}
+                  </span>
+                </div>
+                <p class="t-quote">&ldquo;{item.quote}&rdquo;</p>
+              </div>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+
+  <!-- Honesty caption: these are research personas, not customers. -->
+  <p
+    class="text-center text-[#545454]"
+    style="margin: 40px 30px 0; font-family: var(--font-body); font-size: 12px; line-height: 1.5em;"
+  >
+    These are research personas from our process mapping &mdash; not
+    customers yet. We're honest like that.
+  </p>
+</section>
+
+<style>
+  .ticker-row {
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+  }
+  .ticker-track {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    width: max-content;
+    align-items: stretch;
+  }
+  /* durations are overridden by the script below to hit exactly 30px/s */
+  .ticker-track-a {
+    animation: tick-left 120s linear infinite;
+  }
+  .ticker-track-b {
+    animation: tick-right 120s linear infinite;
+  }
+  @keyframes tick-left {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  @keyframes tick-right {
+    from { transform: translateX(-50%); }
+    to   { transform: translateX(0); }
+  }
+
+  .ticker-item {
+    flex: 0 0 auto;
+    display: flex;
+  }
+
+  /* Testimonial card: 400x230 fixed, like medvi */
+  .t-card {
+    width: 400px;
+    height: 230px;
+    border-radius: 20px;
+    padding: 40px;
+    box-sizing: border-box;
+  }
+  .t-card-top {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .t-name {
+    color: #38312c;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 20px;
+    margin: 0;
+  }
+  .t-stars {
+    display: inline-flex;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+  .t-star {
+    width: 16px;
+    height: 16px;
+    fill: #2e936f;
+  }
+  .t-quote {
+    color: #38312c;
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.6em;
+    margin: 0;
+  }
+
+  /* Photo card: 400x230 cover crop */
+  .t-photo {
+    width: 400px;
+    height: 230px;
+    border-radius: 20px;
+    overflow: hidden;
+  }
+  .t-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+</style>
+
+<script is:inline>
+  // medvi's rows move at exactly 30px/s; the CSS loop covers half the
+  // track (content is duplicated), so duration = (width / 2) / 30.
+  document.querySelectorAll(".ticker-track").forEach(function (track) {
+    var d = track.scrollWidth / 2 / 30;
+    if (d > 0) track.style.animationDuration = d + "s";
+  });
+</script>

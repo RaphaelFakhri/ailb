@@ -1,0 +1,230 @@
+---
+// "Care Coaching" band — structural 1:1 port of medvi's #modern-healthcare
+// (framer-1erojst). Measured from medvi's rendered screenshot pixel by
+// pixel, not just the markup:
+//   - section bg: white (the sage-cream I tried earlier belongs to the
+//     NEXT section — testimonials — not this one)
+//   - headline stack: small eyebrow H6 + big 2-line H2 with green span
+//   - 2-col row: image sits directly on white; right column is a cream
+//     panel (#faf9f7, 30px radius) containing H3 + paragraph
+//   - small brass curved-text SVG badge (~110px) orbiting the panel's
+//     top-left corner — rotated ~55deg, matches medvi's `framer-1jx5x8s`
+//   - closing: a SINGLE centered H3 at ~22px with <br>, green accent
+//     on the second line (not a headline, just a typographic coda)
+//
+// Palette pulled verbatim from medvi's compiled tokens:
+//   green rgb(46,147,111)  → #2e936f  (H2 span + closing span)
+//   brass rgb(198,166,115) → #c6a673  (curved-text badge)
+import { Image } from "astro:assets";
+import engineerFemale from "../assets/sidekick/engineer-female.png";
+---
+
+<section
+  id="craft"
+  class="relative bg-white flex flex-col items-center"
+  style="padding: 120px 30px 100px;"
+  aria-label="How ailb works"
+>
+  <div
+    class="relative z-10 w-full flex flex-col items-center"
+    style="max-width: 1120px; padding: 0 30px; gap: 60px;"
+  >
+    <!-- Headline stack: small eyebrow + big H2 -->
+    <div class="flex flex-col items-center" style="max-width: 820px; gap: 12px;">
+      <h6
+        class="text-center text-[#242220]"
+        style="font-family: var(--font-display); font-size: 10px; font-weight: 500; line-height: 1.5em; letter-spacing: 0.16em; text-transform: uppercase;"
+      >
+        Interview, not forms &mdash; that's the whole UI.
+      </h6>
+      <h2
+        class="cf-h2 text-center text-[#1a1a1a] font-semibold"
+        style="font-family: var(--font-display); font-size: 50px; line-height: 1.05em; letter-spacing: -0.02em;"
+      >
+        How it works:<br />
+        <span style="color: #2e936f;">you talk, it works</span>
+      </h2>
+    </div>
+
+    <!-- Two-column row: image (left) + cream panel (right) together
+         form ONE rounded rectangle bisected down the middle.
+         - no gap; elements touch at a center vertical seam
+         - outer corners rounded (image TL+BL, panel TR+BR)
+         - inner corners square so the seam reads as a clean line
+         - both halves share the same fixed height via items-stretch
+           and an explicit height on the row (560 ≈ medvi's panel
+           dimension, measured from rendered PNG) -->
+    <div
+      class="cf-row flex flex-row"
+      style="gap: 0;"
+    >
+      <!-- LEFT HALF: image, 530×600. Rounded only on left side; right
+           edge square so it butts flush against the panel's square
+           left edge. -->
+      <div
+        class="cf-img overflow-hidden"
+        style="width: 530px; height: 600px; border-radius: 30px 0 0 30px;"
+      >
+        <Image
+          src={engineerFemale}
+          alt="Placeholder imagery"
+          width={760}
+          height={860}
+          loading="eager"
+          class="block w-full h-full object-cover"
+          style="object-position: center center;"
+        />
+      </div>
+
+      <!-- RIGHT HALF: cream panel with H3 + paragraph + badge overlay.
+           530×600 matches image; padding is inside the box via
+           box-sizing:border-box so total size stays 530×600. Rounded
+           only on right side; left edge square. -->
+      <div
+        class="cf-panel relative flex flex-col justify-center"
+        style="width: 530px; height: 600px; padding: 60px; box-sizing: border-box; border-radius: 0 30px 30px 0; background-color: #faf9f7; gap: 16px;"
+      >
+        <!-- Rotated curved-text badge — 164px, anchored top-right of
+             the cream panel. Sits 29px above panel top, overhangs 36px
+             past panel right edge. Measurements taken pixel-exact from
+             medvi's compiled output.
+             Path + textPath structure mirrors medvi's framer-1jx5x8s
+             verbatim: two semicircle arcs forming a full closed circle,
+             rotated 55.488deg at the wrapper, text with
+             dominant-baseline="Text Top" so the glyphs sit OUTSIDE the
+             path. font-size 12px, letter-spacing .15em, weight 600,
+             fill #c6a673. -->
+        <div
+          aria-hidden="true"
+          class="absolute"
+          id="craftBadge"
+          style="top: -29px; right: -36px; width: 164px; height: 164px; transform: rotate(55.488deg); transform-origin: center; pointer-events: none;"
+        >
+          <svg viewBox="0 0 100 100" overflow="visible" class="craft-badge-spin" style="width: 100%; height: 100%; transform-origin: center;">
+            <defs>
+              <path
+                id="craft-curve"
+                d="M 0 50 L 0 50 A 1 1 0 0 1 100 50 L 100 50 L 100 50 A 1 1 0 0 1 0 50 L 0 50"
+                stroke-width="none"
+                fill="transparent"
+              />
+            </defs>
+            <text>
+              <textPath
+                href="#craft-curve"
+                startOffset="0"
+                dominant-baseline="Text Top"
+                style="font-family: var(--font-display); font-size: 12px; font-weight: 600; font-style: normal; letter-spacing: 0.15em; line-height: 0.9em; fill: #c6a673;"
+              >
+                YOU TALK • THE AGENT DELIVERS •
+              </textPath>
+            </text>
+          </svg>
+        </div>
+
+        <h3
+          class="cf-h3 text-[#1a1a1a] font-semibold"
+          style="font-family: var(--font-display); font-size: 26px; line-height: 1.2em; letter-spacing: -0.02em;"
+        >
+          Three steps, zero forms
+        </h3>
+        <p
+          class="text-[#545454]"
+          style="font-family: var(--font-body); font-size: 14px; line-height: 1.6em;"
+        >
+          <span style="font-weight: 600; color: #1a1a1a;">1. Tell ailb what you need.</span><br />
+          Voice note, photo, 3arabe or English or franco &mdash;
+          &#1603;&#1604;&#1608; &#1605;&#1575;&#1588;&#1610;. The agent asks
+          the right follow-ups, like a good concierge would.
+        </p>
+        <p
+          class="text-[#545454]"
+          style="font-family: var(--font-body); font-size: 14px; line-height: 1.6em;"
+        >
+          <span style="font-weight: 600; color: #1a1a1a;">2. The agent does the work.</span><br />
+          It prices, lists, hunts, verifies, preps the file, and answers
+          every question so you don't have to.
+        </p>
+        <p
+          class="text-[#545454]"
+          style="font-family: var(--font-body); font-size: 14px; line-height: 1.6em;"
+        >
+          <span style="font-weight: 600; color: #1a1a1a;">3. You approve.</span><br />
+          Money, keys, and signatures stay human. Nothing happens without
+          your yes.
+        </p>
+      </div>
+    </div>
+
+    <!-- Closing: single H3 with <br>, green span on line 2 -->
+    <div class="flex flex-col items-center" style="max-width: 820px; padding-top: 10px;">
+      <h3
+        class="cf-close text-center text-[#1a1a1a] font-semibold"
+        style="font-family: var(--font-display); font-size: 22px; font-weight: 600; line-height: 1.6em; letter-spacing: -0.02em;"
+      >
+        Lebanon doesn't lack marketplaces &mdash; it lacks trust<br />
+        <span style="color: #2e936f;">The agent verifies both sides before anyone meets</span>
+      </h3>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  /* medvi's badge spin, measured live with no scrolling: 24 deg/s
+     continuous clockwise = 360deg / 15s, linear. Wrapper keeps the
+     static 55.488deg base; the svg spins inside it. */
+  @keyframes craft-badge-spin {
+    to { transform: rotate(360deg); }
+  }
+  .craft-badge-spin {
+    animation: craft-badge-spin 15s linear infinite;
+  }
+
+  /* Sub-desktop tiers measured on medvi: the image+panel pair stacks
+     into ONE vertical rounded rectangle (image top, 50px top radii;
+     panel below, 50px bottom radii) in a 640px column; phone is the
+     same at full width with a 200px-tall image. */
+  @media (max-width: 1199.98px) {
+    #craft .cf-row {
+      flex-direction: column;
+      width: 100%;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+    #craft .cf-img {
+      width: 100% !important;
+      height: 510px !important;
+      border-radius: 50px 50px 0 0 !important;
+    }
+    #craft .cf-panel {
+      width: 100% !important;
+      height: auto !important;
+      padding: 60px 140px 80px 80px !important;
+      border-radius: 0 0 50px 50px !important;
+    }
+    #craft .cf-h2 { font-size: 40px !important; }
+    #craft .cf-h3 { font-size: 24px !important; }
+    #craft .cf-close { font-size: 20px !important; }
+    #craft .z-10 { gap: 50px !important; }
+    /* medvi tablet (visual, not bbox): ring fully below the seam —
+       center ~106px under the panel top, centered ON the right edge */
+    #craft #craftBadge {
+      width: 116px !important; height: 116px !important;
+      top: 48px !important; right: -58px !important;
+    }
+  }
+  @media (max-width: 809.98px) {
+    /* single 30px gutter at phone like medvi (section already pads 30) */
+    #craft .z-10 { padding: 0 !important; }
+    #craft .cf-img { height: 200px !important; }
+    #craft .cf-panel { padding: 50px 80px 50px 50px !important; }
+    #craft .cf-h2 { font-size: 32px !important; }
+    #craft .cf-h3 { font-size: 20px !important; }
+    #craft .cf-close { font-size: 18px !important; }
+    #craft #craftBadge {
+      width: 88px !important; height: 88px !important;
+      top: 12px !important; right: -14px !important;
+    }
+    #craft .cf-close br { display: none; }
+  }
+</style>

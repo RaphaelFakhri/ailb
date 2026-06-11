@@ -1,0 +1,104 @@
+---
+// Footer — structural port of medvi.org's Footer block (data-framer-name="Footer").
+// Order: trust-badges row → quick links (logo + contact) → legal copy → hairline
+// → bottom row (copyright + nav links). Layout dimensions lifted from medvi's
+// compiled CSS:
+//   outer:  bg #fff, full-width, column, no own padding (children handle it)
+//   inner:  max-w 1120px, padding 50px 30px, column, items-start
+//   quick:  row, space-between, padding-bottom 40px
+//   legal:  column, gap 32px
+//   hairline: 1px, top-border #ddd
+//   bottom: row, space-between, padding-bottom 40px
+import TrustBadges from "./TrustBadges.astro";
+import AilbLogo from "./AilbLogo.astro";
+
+const navLinks = [
+  { href: "https://github.com/RaphaelFakhri/ailb", label: "GitHub" },
+  { href: "https://wa.me/96178720415?text=Hi%20ailb", label: "WhatsApp +961 78 720 415" },
+];
+---
+
+<footer class="bg-white text-[#242220] w-full">
+  <TrustBadges />
+
+  <div class="w-full max-w-[1120px] mx-auto flex flex-col items-stretch" style="padding: 50px 30px 0;">
+
+    <!-- Quick links row: logo (left) + contact (right) -->
+    <div class="flex flex-col min-[1200px]:flex-row min-[1200px]:items-center w-full" style="padding-bottom: 40px; gap: 40px;">
+      <a href="/" class="blur-up inline-flex items-center text-[#242220]" aria-label="ailb home">
+        <AilbLogo height={25} />
+      </a>
+
+      <ul class="flex flex-col min-[1200px]:flex-row min-[1200px]:items-center min-[1200px]:ml-auto" style="gap: 10px;">
+        <li class="blur-up flex items-center" style="gap: 10px; background: rgb(250, 250, 250); border-radius: 50px; padding: 20px 24px;">
+          <span class="shrink-0" style="color: #38312c;" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.2-.6.8-.8 1-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.4-3c-.3-.4 0-.5.2-.7l.4-.5c.1-.2.2-.3.3-.5v-.5c0-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.2s.9 2.5 1.1 2.7c.1.2 1.8 2.8 4.4 3.9.6.3 1.1.4 1.5.5.6.2 1.2.2 1.6.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.2-.2-.4-.2Z"/>
+            </svg>
+          </span>
+          <a href="https://wa.me/96178720415?text=Hi%20ailb" rel="noopener" class="text-[14px] font-semibold leading-[20px] hover:underline">
+            +961 78 720 415
+          </a>
+        </li>
+        <li class="blur-up flex items-center" style="gap: 10px; background: rgb(250, 250, 250); border-radius: 50px; padding: 20px 24px;">
+          <span class="shrink-0" style="color: #38312c;" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 18l6-6-6-6"/>
+              <path d="M8 6l-6 6 6 6"/>
+            </svg>
+          </span>
+          <a
+            href="https://github.com/RaphaelFakhri/ailb"
+            rel="noopener"
+            class="text-[14px] font-semibold leading-[20px] hover:underline"
+          >
+            github.com/RaphaelFakhri/ailb
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Legal copy: each paragraph rises as its own block, like medvi -->
+    <div class="flex flex-col w-full" style="gap: 32px; padding-bottom: 40px;">
+      <p class="blur-up" style="font-family: var(--font-body); font-size: 14px; line-height: 1.6em;">
+        ailb is an AI concierge for life in Lebanon: a marketplace of
+        things, a marketplace of services, and a guide through government
+        paperwork &mdash; all through one agent on WhatsApp and web chat.
+        The agent prepares; money, keys, and signatures stay human.
+      </p>
+      <p class="blur-up" style="font-family: var(--font-body); font-size: 14px; line-height: 1.6em;">
+        <span style="font-weight: 500;">Your data</span><br />
+        Your phone number is never shown to buyers, sellers, or providers.
+        The agent verifies both sides before anyone meets.
+      </p>
+      <p class="blur-up" style="font-family: var(--font-body); font-size: 14px; line-height: 1.6em;">
+        Scenario quotes on this site are voiced by research personas from
+        our mapping of 15 Lebanese processes &mdash; they are not customer
+        testimonials. Imagery is placeholder.
+      </p>
+    </div>
+
+    <!-- Hairline -->
+    <div style="height: 1px; width: 100%; background-color: #ddd;" aria-hidden="true"></div>
+
+    <!-- Bottom row: hackathon credit (left) + nav links (right) -->
+    <div class="blur-up flex flex-col min-[1200px]:flex-row min-[1200px]:items-center w-full" style="padding: 24px 0 40px; gap: 16px;">
+      <p style="font-family: var(--font-body); font-size: 12px; font-weight: 600; line-height: 20px;">
+        Built for the AI Agents Hackathon 2026 &mdash; Life in Lebanon 🇱🇧 · built on a fork of OpenClaw
+      </p>
+
+      <nav class="flex flex-wrap min-[1200px]:ml-auto" style="gap: 24px;" aria-label="Footer">
+        {navLinks.map((l) => (
+          <a
+            href={l.href}
+            rel="noopener"
+            style="font-family: var(--font-body); font-size: 14px; line-height: 20px;"
+            class="hover:underline"
+          >
+            {l.label}
+          </a>
+        ))}
+      </nav>
+    </div>
+  </div>
+</footer>

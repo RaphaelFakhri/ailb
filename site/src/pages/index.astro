@@ -1,0 +1,155 @@
+---
+import Base from "../layouts/Base.astro";
+import AilbLogo from "../components/AilbLogo.astro";
+import Hero from "../components/Hero.astro";
+import Marquee from "../components/Marquee.astro";
+import Sidekick from "../components/Sidekick.astro";
+import Flash from "../components/Flash.astro";
+import Bounty from "../components/Bounty.astro";
+import Craft from "../components/Craft.astro";
+import Testimonials from "../components/Testimonials.astro";
+import MenuDrawer from "../components/MenuDrawer.astro";
+import Footer from "../components/Footer.astro";
+---
+
+<Base
+  title="ailb — your concierge for life in Lebanon"
+  description="ailb is an AI concierge for life in Lebanon. One agent that sells your stuff, finds your people, and fights your paperwork — on WhatsApp or right here."
+>
+  <!--
+    Blue band = gradient + absolute-positioned nav + Hero only.
+    Natural height: md:h-[524px] on desktop, auto on mobile (from Hero).
+    Everything else on the page sits below on the body's cream bg.
+  -->
+  <!--
+    Hero background: corner-to-corner linear gradient at 166°, top-left
+    brighter → bottom-right near-black. Same technique the reference uses
+    (which has NO ambient glow element at all — it's just two tonal shades
+    of the hero's base color at that diagonal).
+  -->
+  <div
+    class="relative text-white"
+    style="background: linear-gradient(166deg, #1d386a 0%, #080f1c 100%);"
+  >
+
+    <!-- Nav states live in .site-nav (global.css). Three data-states:
+         top / hidden / scrolled — CSS handles transforms, bg, text
+         color, shadow, and state-specific easing durations.
+         Starts in `hidden` on load; JS flips it to `top` after the
+         hero entrance animation completes (~900ms) so the nav
+         drops down into view as part of the page-load sequence. -->
+    <div id="site-nav" data-state="hidden" class="site-nav">
+      <div class="max-w-[1120px] mx-auto px-[30px] py-[14px] h-[60px] flex items-center justify-between">
+        <a href="/" class="inline-block text-[16px] md:text-[20px]">
+          <AilbLogo />
+        </a>
+        <button
+          type="button"
+          aria-label="Open menu"
+          data-menu-open
+          class="cursor-pointer flex flex-col items-center justify-center gap-[7px] pl-3 py-3"
+        >
+          <span class="block w-[22px] h-[2px] bg-current rounded-full"></span>
+          <span class="block w-[22px] h-[2px] bg-current rounded-full"></span>
+        </button>
+      </div>
+    </div>
+
+    <script is:inline>
+      (() => {
+        const nav = document.getElementById("site-nav");
+        if (!nav) return;
+
+        // Hysteresis to avoid flicker on touchpad micro-scrolls.
+        const DIR_DELTA = 4;
+        // "Top zone" = upper 300px. This zone ONLY controls what happens
+        // when you scroll UP into it (white banner → transparent + white
+        // text). Scrolling DOWN still hides the nav immediately — we
+        // don't want the nav to linger over the hero while the user is
+        // heading into content. At y=0 exactly (page top with no scroll
+        // delta recorded), the nav starts in top-state, so the first
+        // scroll-down event triggers a visible slide up.
+        const TOP_ZONE = 410;
+        // At-rest zone at the absolute top. Inside this, a stopped
+        // scroll (|delta| tiny) keeps the top-state visible.
+        const AT_TOP = 5;
+
+        let lastY = window.scrollY;
+        let ticking = false;
+        // Page-load sequence: nav starts hidden so it drops down as the
+        // final beat after the hero text + cards finish their entrance.
+        // Delay matches the hero text's longest delay (300ms) + a bit
+        // of tail so the nav lands just as the text settles.
+        setTimeout(() => {
+          if (nav.dataset.state === "hidden") {
+            nav.dataset.state = "top";
+          }
+        }, 900);
+
+        const compute = () => {
+          const y = window.scrollY;
+          const delta = y - lastY;
+
+          if (y <= AT_TOP) {
+            // Parked at the top — always show the hero-style nav.
+            nav.dataset.state = "top";
+          } else if (delta > DIR_DELTA) {
+            // Any downward movement hides the nav — even inside TOP_ZONE.
+            nav.dataset.state = "hidden";
+          } else if (delta < -DIR_DELTA && y <= TOP_ZONE) {
+            // Scrolling back up into the top zone: restore hero-style
+            // transparent-bg + white-text nav (no white banner).
+            nav.dataset.state = "top";
+          } else if (delta < -DIR_DELTA) {
+            nav.dataset.state = "scrolled";
+          }
+          // |delta| <= DIR_DELTA → keep current state (no flicker)
+
+          lastY = y;
+          ticking = false;
+        };
+
+        window.addEventListener(
+          "scroll",
+          () => {
+            if (!ticking) {
+              requestAnimationFrame(compute);
+              ticking = true;
+            }
+          },
+          { passive: true }
+        );
+      })();
+    </script>
+
+    <Hero />
+  </div>
+
+  <Marquee />
+
+  <Sidekick />
+
+  <Flash />
+
+  <Bounty />
+
+  <Craft />
+
+  <Testimonials />
+
+  <Footer />
+
+  <MenuDrawer
+    items={[
+      { label: "Things", href: "#things" },
+      { label: "Services", href: "#services" },
+      { label: "Government", href: "#government" },
+      { label: "How it works", href: "#craft" },
+      { label: "Scenarios", href: "#testimonials" },
+    ]}
+    foot={[
+      { label: "Chat on WhatsApp", href: "https://wa.me/96178720415?text=Hi%20ailb", icon: "chat" },
+      { label: "GitHub", href: "https://github.com/RaphaelFakhri/ailb", icon: "arrow" },
+    ]}
+  />
+</Base>

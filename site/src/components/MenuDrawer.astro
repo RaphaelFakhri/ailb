@@ -1,0 +1,389 @@
+---
+// Right-side menu drawer — 1:1 port of medvi.org's "All Offerings" menu.
+// Measured live on medvi.org (2026-06-11, 1440px viewport, menu open):
+//   fixed wrapper: right edge, 400px wide, full height, 20px top/bottom inset
+//   white card: border-radius 20px 0 0 20px, header (logo + close X),
+//     then a 30px-padded list: rows 16px/500 Red Hat Text #242220,
+//     24px tall, 18px apart (42px pitch), chevron-right at the row end
+//   bottom area pinned to the card's foot
+//   opens by sliding in from the right; anchor clicks smooth-scroll and close
+// Trigger: any element with [data-menu-open] on the page.
+// foot: medvi's bottom row — side-by-side 14px/500 links with 27px
+// stroke icons (Contact Support = chat bubble, About Us = heart).
+// The sidekick variant mirrors glp1.medvi.org's menu (measured 2026-06-11):
+//   list rows 17px/500 (vs 16px on medvi.org), then a 3px line, then a
+//   horizontally-scrollable product carousel (200px cards, gap 12,
+//   pad 30: sage 200x210 panel, image overhanging to 220px from y+20,
+//   badge chip at +10/+10 [mint rgb(169,255,203) for Popular], title
+//   16px/600 at +250, 12px price line), another 3px line, then bottom
+//   links stacked vertically (27px icon + 10px gap, 14px/500, 10px apart).
+interface Props {
+  items: { label: string; href: string }[];
+  listSize?: number; // px — 16 on medvi.org, 17 on glp1
+  products?: {
+    label: string;
+    href?: string; // omit = inert (Coming Soon)
+    img: string;
+    badge: string;
+    badgeTone: "mint" | "white";
+    price: string; // may contain <strong>
+    priceTone: "green" | "gray";
+  }[];
+  foot: { label: string; href: string; icon: "chat" | "heart" | "arrow" | "info" | "faq" }[];
+  footStack?: boolean; // glp1 stacks the foot links vertically
+  cta?: { label: string; href: string }; // glp1: charcoal pill at the drawer bottom
+}
+const { items, listSize = 16, products, foot, footStack = false, cta } = Astro.props;
+import svgSource from "../assets/ailb-wordmark.svg?raw";
+
+const footIcons: Record<string, string> = {
+  chat: "M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z",
+  heart: "M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z",
+  arrow: "M5 12h14M13 6l6 6-6 6",
+  info: "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z M12 16v-5 M11.95 8h.1",
+  faq: "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z M9.1 9.3a3 3 0 0 1 5.8 1c0 2-2.9 2.7-2.9 4.2 M11.95 17.5h.1",
+};
+---
+
+<div class="mdrawer" id="menuDrawer" aria-hidden="true">
+  <div class="mdrawer__backdrop" data-menu-close></div>
+  <div class="mdrawer__panel" role="dialog" aria-modal="true" aria-label="Menu">
+    <div class="mdrawer__card">
+      <div class="mdrawer__head">
+        <span class="mdrawer__logo" set:html={svgSource} />
+        <button class="mdrawer__close" data-menu-close aria-label="Close menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
+        </button>
+      </div>
+      <nav class="mdrawer__list" aria-label="Sections" style={`font-size: ${listSize}px;`}>
+        {items.map((it) => (
+          <a href={it.href}>
+            <span>{it.label}</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6" /></svg>
+          </a>
+        ))}
+      </nav>
+      {products && (
+        <div class="mdrawer__products">
+          {products.map((p) => {
+            const Tag = p.href ? "a" : "div";
+            return (
+              <Tag class="mdrawer__pcard" href={p.href} style={p.href ? undefined : "cursor: default;"}>
+                <div class="mdrawer__pimg">
+                  <div class="mdrawer__ppanel"></div>
+                  <span class={`mdrawer__pbadge mdrawer__pbadge--${p.badgeTone}`}>{p.badge}</span>
+                  <img src={p.img} alt="" loading="lazy" />
+                </div>
+                <h3>{p.label}</h3>
+                <p class={`mdrawer__pprice mdrawer__pprice--${p.priceTone}`} set:html={p.price} />
+              </Tag>
+            );
+          })}
+        </div>
+      )}
+      <div class={`mdrawer__foot${footStack ? " mdrawer__foot--stack" : ""}`}>
+        {foot.map((f) => (
+          <a class="mdrawer__footlink" href={f.href}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d={footIcons[f.icon]} /></svg>
+            <span>{f.label}</span>
+          </a>
+        ))}
+      </div>
+      {cta && (
+        <div class="mdrawer__ctawrap">
+          <a class="mdrawer__ctabtn" href={cta.href}>{cta.label}</a>
+        </div>
+      )}
+    </div>
+  </div>
+</div>
+
+<style>
+  .mdrawer {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    pointer-events: none;
+  }
+  .mdrawer__backdrop {
+    position: absolute;
+    inset: 0;
+    /* medvi dims the page behind the drawer: rgba(0,0,0,.5) overlay */
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: opacity 380ms cubic-bezier(0.05, 0.5, 0.5, 0.95);
+  }
+  .mdrawer.open .mdrawer__backdrop {
+    opacity: 1;
+  }
+  .mdrawer__panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: min(400px, 100vw);
+    padding: 20px 0;
+    box-sizing: border-box;
+    transform: translateX(105%);
+    /* medvi's open slide, recorded at 60fps and curve-fit: ~400ms
+       decelerating tail, no overshoot — 380ms (0.05,0.5,0.5,0.95)
+       matches their trace within 1% at every sample. */
+    transition: transform 380ms cubic-bezier(0.05, 0.5, 0.5, 0.95);
+  }
+  .mdrawer.open {
+    pointer-events: auto;
+  }
+  .mdrawer.open .mdrawer__panel {
+    transform: translateX(0);
+  }
+  .mdrawer__card {
+    height: 100%;
+    background: #fff;
+    border-radius: 20px 0 0 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  /* don't let the column compress sections — the card scrolls instead
+     (glp1's does: its FAQ row sits below the card fold) */
+  .mdrawer__card > * {
+    flex-shrink: 0;
+  }
+  .mdrawer__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 26px 30px 18px;
+  }
+  .mdrawer__logo :global(svg) {
+    height: 16px;
+    width: auto;
+    display: block;
+    color: #242220;
+    fill: currentColor;
+  }
+  .mdrawer__close {
+    background: none;
+    border: 0;
+    padding: 4px;
+    cursor: pointer;
+    color: #242220;
+    display: flex;
+  }
+  .mdrawer__close svg {
+    width: 22px;
+    height: 22px;
+  }
+  .mdrawer__list {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 30px;
+  }
+  .mdrawer__list a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: "Red Hat Text", var(--font-body, sans-serif);
+    font-size: inherit;
+    font-weight: 500;
+    line-height: 1.5em;
+    color: #242220;
+    text-decoration: none;
+  }
+  /* medvi hover: no color change — the label slides 5px right with a
+     small spring overshoot; the chevron/icon stays put. */
+  .mdrawer__list a span {
+    display: inline-block;
+    transition: transform 200ms cubic-bezier(0.3, 1.05, 0.4, 1.02);
+  }
+  .mdrawer__list a:hover span {
+    transform: translateX(5px);
+  }
+  .mdrawer__list svg {
+    width: 16px;
+    height: 16px;
+  }
+  /* glp1's product carousel: horizontally scrollable row above the
+     foot, behind its own 3px line; scrollbar hidden. */
+  .mdrawer__products {
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    padding: 30px;
+    border-top: 3px solid rgb(245, 244, 244);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .mdrawer__products::-webkit-scrollbar {
+    display: none;
+  }
+  .mdrawer__pcard {
+    flex: none;
+    display: block;
+    width: 200px;
+    border-radius: 20px;
+    text-decoration: none;
+  }
+  .mdrawer__pimg {
+    position: relative;
+    height: 250px;
+  }
+  .mdrawer__ppanel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 210px;
+    border-radius: 20px;
+    background: rgb(241, 245, 233);
+  }
+  .mdrawer__pimg img {
+    position: absolute;
+    top: 20px;
+    left: 0;
+    width: 100%;
+    height: 220px;
+    object-fit: contain;
+  }
+  .mdrawer__pbadge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 1;
+    padding: 4px 10px;
+    border-radius: 100px;
+    font-family: "Red Hat Text", var(--font-body, sans-serif);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 18px;
+    color: #242220;
+  }
+  .mdrawer__pbadge--mint {
+    background: rgb(169, 255, 203);
+  }
+  .mdrawer__pbadge--white {
+    background: #fff;
+  }
+  .mdrawer__pcard h3 {
+    margin: 0;
+    text-align: center;
+    font-family: "Red Hat Text", var(--font-body, sans-serif);
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 21px;
+    color: #242220;
+  }
+  .mdrawer__pprice {
+    margin: 0;
+    text-align: center;
+    font-family: "Red Hat Text", var(--font-body, sans-serif);
+    font-size: 12px;
+    line-height: 18px;
+  }
+  .mdrawer__pprice--green {
+    font-weight: 400;
+    color: rgb(46, 147, 111);
+  }
+  .mdrawer__pprice--gray {
+    font-weight: 600;
+    color: rgb(115, 111, 107);
+  }
+  /* medvi: foot follows the list directly (not pinned to the card
+     bottom). The divider is a full-width 3px rgb(245,244,244) bar
+     ("Line" element on medvi), with 30px to the links below it. */
+  .mdrawer__foot {
+    display: flex;
+    flex-direction: row;
+    gap: 14px;
+    padding: 30px;
+    border-top: 3px solid rgb(245, 244, 244);
+  }
+  /* glp1 stacks the foot links vertically, 10px apart */
+  .mdrawer__foot--stack {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .mdrawer__foot--stack .mdrawer__footlink {
+    flex: none;
+  }
+  /* medvi: the foot links are two equal-width columns (163px each in
+     the 340px content row), so the second starts at the midpoint. */
+  .mdrawer__footlink {
+    flex: 1 1 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: "Red Hat Text", var(--font-body, sans-serif);
+    font-size: 14px;
+    font-weight: 500;
+    color: #242220;
+    text-decoration: none;
+  }
+  .mdrawer__footlink span {
+    display: inline-block;
+    transition: transform 200ms cubic-bezier(0.3, 1.05, 0.4, 1.02);
+  }
+  .mdrawer__footlink:hover span {
+    transform: translateX(5px);
+  }
+  .mdrawer__footlink svg {
+    width: 27px;
+    height: 27px;
+  }
+  /* glp1: full-width charcoal pill at the drawer bottom (340x43,
+     radius 500, white 12px/600 uppercase) linking to intake */
+  .mdrawer__ctawrap {
+    padding: 9px 30px 30px;
+  }
+  .mdrawer__ctabtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 43px;
+    border-radius: 500px;
+    background: #242220;
+    color: #fff;
+    text-decoration: none;
+    font-family: "Red Hat Text", var(--font-body, sans-serif);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    transition: opacity 0.2s ease;
+  }
+  .mdrawer__ctabtn:hover {
+    opacity: 0.9;
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var drawer = document.getElementById("menuDrawer");
+    if (!drawer) return;
+    function open() {
+      drawer.classList.add("open");
+      drawer.setAttribute("aria-hidden", "false");
+    }
+    function close() {
+      drawer.classList.remove("open");
+      drawer.setAttribute("aria-hidden", "true");
+    }
+    document.querySelectorAll("[data-menu-open]").forEach(function (b) {
+      b.addEventListener("click", function (e) {
+        e.preventDefault();
+        open();
+      });
+    });
+    drawer.querySelectorAll("[data-menu-close]").forEach(function (b) {
+      b.addEventListener("click", close);
+    });
+    drawer.querySelectorAll('a[href^="#"]').forEach(function (a) {
+      a.addEventListener("click", close);
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") close();
+    });
+  })();
+</script>

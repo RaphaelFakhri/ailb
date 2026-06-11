@@ -1,0 +1,69 @@
+---
+// Rotating-errands ticker, 1:1 with medvi's under-hero strip.
+// - 8 errands × 4 copies (= 32 <li>) so the -25% keyframe lands the
+//   start of copy 2 exactly where copy 1 began (seamless).
+// - Icon SVGs are defined ONCE in a hidden <svg><defs> at the top
+//   and each <li> references them via <use href="#..."/>. Cuts HTML
+//   weight vs inlining the same paths 16 times.
+// - Marquee keyframe + animation class live in global.css so Astro's
+//   style scoping doesn't rename them and break the binding.
+
+type Prop = { label: string; id: string };
+
+// Everyday Lebanese errands the agent runs. Icons cycle through the
+// four neutral glyphs below.
+const PROPS: Prop[] = [
+  { label: "sell your car",                   id: "i-dollar" },
+  { label: "find an electrician tonight",     id: "i-bolt"   },
+  { label: "Schengen visa file",              id: "i-cursor" },
+  { label: "ikhraj qaid before it expires",   id: "i-person" },
+  { label: "price my iPhone",                 id: "i-dollar" },
+  { label: "a tutor for Brevet math",         id: "i-person" },
+  { label: "transfer the mécanique",          id: "i-cursor" },
+  { label: "movers who quote once",           id: "i-bolt"   },
+];
+
+const items = [...PROPS, ...PROPS, ...PROPS, ...PROPS];
+---
+
+<section class="marquee-sec bg-white mt-[114px] overflow-hidden" aria-label="Errands the agent runs">
+  <!-- Hidden symbol library. display:none strips it from layout while
+       leaving ids resolvable for <use href="#..."> instances below. -->
+  <svg aria-hidden="true" style="display:none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <symbol id="i-dollar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2.5v19"/>
+        <path d="M17 6H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+      </symbol>
+      <symbol id="i-cursor" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 4l8.5 16 2.5-7 7-2.5L4 4z"/>
+        <path d="M14.5 14.5l5 5"/>
+      </symbol>
+      <symbol id="i-bolt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M13 2L3.5 14h7l-1 8L20 10h-7l1-8z"/>
+      </symbol>
+      <symbol id="i-person" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="8" r="4"/>
+        <path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/>
+      </symbol>
+    </defs>
+  </svg>
+
+  <div class="relative h-[29px]">
+    <ul class="marquee-track flex w-max h-full items-center" role="group">
+      {items.map((p, i) => (
+        <li
+          aria-hidden={i >= PROPS.length ? "true" : undefined}
+          class="flex items-center gap-[10px] shrink-0 text-[#171a18] pr-[50px]"
+        >
+          <svg class="w-[22px] h-[22px] shrink-0 block" aria-hidden="true">
+            <use href={`#${p.id}`} />
+          </svg>
+          <span class="text-[10px] font-medium uppercase tracking-[0.16em] leading-none whitespace-nowrap">
+            {p.label}
+          </span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>

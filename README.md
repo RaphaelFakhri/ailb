@@ -43,13 +43,23 @@ Scope wasn't guessed — it was mapped. We sticky-noted **15 reality maps** of L
 
 ## Local development
 
-The site is a static page plus Cloudflare Pages Functions — no framework, no build step.
+The site is an Astro static build plus Cloudflare Pages Functions.
 
 ```bash
-npx wrangler pages dev site/public
+cd site
+npm install
+npm run dev          # Astro dev server (UI only, no /api)
 ```
 
-Wrangler picks up `site/functions/` automatically (config in `site/wrangler.toml`).
+To exercise the Pages Functions (`/api/*`) locally, build and serve through Wrangler:
+
+```bash
+cd site
+npm run build        # outputs site/dist/
+npx wrangler pages dev dist
+```
+
+Deploys read `site/wrangler.toml` (`pages_build_output_dir = "dist"`), so `npx wrangler pages deploy` from `site/` ships the built `dist/` with `site/functions/` picked up automatically.
 
 **Environment:**
 

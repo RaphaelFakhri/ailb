@@ -1,6 +1,6 @@
 name = "ailb"
 compatibility_date = "2026-06-01"
-pages_build_output_dir = "public"
+pages_build_output_dir = "dist"
 
 [vars]
 RELAY_URL = "https://ailb-relay.symbai.dev"

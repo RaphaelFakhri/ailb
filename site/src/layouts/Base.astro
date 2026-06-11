@@ -1,0 +1,116 @@
+---
+import "../styles/global.css";
+import ChatWidget from "../components/ChatWidget.astro";
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+    <!-- Single-family typography: Red Hat Text (400/500/600) -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Red+Hat+Text:wght@400;500;600;700&display=swap"
+    />
+    <!-- Logo wordmark: Satoshi 900 (Fontshare, free commercial) -->
+    <link
+      rel="stylesheet"
+      href="https://api.fontshare.com/v2/css?f[]=satoshi@900&display=swap"
+    />
+
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta name="theme-color" content="#ffffff" />
+  </head>
+  <body class="bg-[--color-bg] text-[--color-ink] antialiased">
+    <slot />
+    <ChatWidget />
+    <style is:global>
+      /* medvi appear (measured on medvi.org): opacity 0 + translateY(20px),
+         ~200ms opacity / ~240ms springy rise, no blur, no stagger. */
+      .blur-up { opacity: 0; transform: translateY(20px); }
+      .blur-up.bin {
+        opacity: 1; transform: none;
+        transition: opacity 200ms ease, transform 240ms cubic-bezier(0.3, 1.05, 0.4, 1.02);
+      }
+      .fade-only { opacity: 0; }
+      .fade-only.bin { opacity: 1; transition: opacity 200ms ease; }
+      @media (prefers-reduced-motion: reduce) {
+        .blur-up, .fade-only { opacity: 1; transform: none; }
+      }
+    </style>
+    <script is:inline>
+      // Auto-tag the medvi appear pattern: every section heading, its sibling
+      // copy/CTAs, and testimonial cards (opacity-only, like medvi's).
+      (function () {
+        document.querySelectorAll("h2, h3").forEach(function (h) {
+          if (h.closest("nav") || h.classList.contains("hero-enter") || h.closest(".blur-up")) return;
+          h.classList.add("blur-up");
+          var parent = h.parentElement;
+          if (!parent) return;
+          Array.prototype.forEach.call(parent.children, function (sib) {
+            if (sib === h) return;
+            var tag = sib.tagName;
+            if ((tag === "P" || tag === "A") && !sib.classList.contains("blur-up") && !sib.closest(".hero-enter")) {
+              sib.classList.add("blur-up");
+            }
+          });
+        });
+        document.querySelectorAll("h4").forEach(function (h) {
+          var block = h.parentElement;
+          if (!block || block.closest(".blur-up") || block.closest("nav") || block.closest("footer")) return;
+          block.classList.add("blur-up");
+        });
+        document.querySelectorAll(".t-card, .t-photo").forEach(function (c) {
+          c.classList.add("fade-only");
+        });
+        var els = document.querySelectorAll(".blur-up, .fade-only");
+        if (!("IntersectionObserver" in window)) {
+          els.forEach(function (e) { e.classList.add("bin"); });
+          return;
+        }
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) {
+            if (!e.isIntersecting) return;
+            if (e.target.classList.contains("ticker-row")) {
+              e.target.querySelectorAll(".fade-only").forEach(function (c) { c.classList.add("bin"); });
+            } else {
+              e.target.classList.add("bin");
+            }
+            io.unobserve(e.target);
+          });
+        }, { threshold: 0.01 }); // medvi fires as the element touches the viewport edge
+        // footer blocks fire when mostly visible like medvi's footer
+        var ioFooter = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) {
+            if (!e.isIntersecting) return;
+            e.target.classList.add("bin");
+            ioFooter.unobserve(e.target);
+          });
+        }, { threshold: 0.6 });
+        els.forEach(function (e) {
+          // ticker cards scroll horizontally and may never intersect — observe their row instead
+          if (e.closest(".ticker-row")) return;
+          (e.closest("footer") ? ioFooter : io).observe(e);
+        });
+        document.querySelectorAll(".ticker-row").forEach(function (r) { io.observe(r); });
+      })();
+    </script>
+  </body>
+</html>

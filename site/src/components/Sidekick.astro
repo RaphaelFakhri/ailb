@@ -1,0 +1,335 @@
+---
+// Sidekick feature section — 1:1 port of medvi.org's "Weight Loss" layout.
+// All dimensions pulled verbatim from medvi's compiled CSS (see the
+// agent-extracted spec in the repo). Key sizes:
+//   section padding: 80px 30px 120px
+//   container max-w: 1120px, inner gap 50px
+//   upper row: 40px column gap; left col = min-content, right col = fluid
+//   left "graphic" wrapper: 490px tall, overflow clipped
+//     rounded card bg behind: 335px tall, 50px radius, #deede0
+//     image sits on top, 97% of wrapper width, anchored to top
+//   bullet rows: 14px gap between bullets, 23×23 checkmark chip
+//   right images wrapper: 498px tall, 2 tiles @ 306×452, 20px radius,
+//     one pinned top-right, the other bottom-left (diagonal stagger)
+//   cards-and-copy: 20px top padding, 26px gap
+//   feature cards: gap 20, each h 160, radius 20, bg #faf9f7, flex row,
+//     image pinned left, text right
+//
+// Content adapted for ailb's THINGS pillar (marketplace of things).
+// Images are kept as placeholders from the original design.
+import { Image } from "astro:assets";
+import engineerMale from "../assets/sidekick/engineer-male.png";
+import engineerFemale from "../assets/sidekick/engineer-female.png";
+import workspace from "../assets/sidekick/workspace.png";  // pre-composited: top transparent (laptop cutout), bottom full photo
+import phoneThread from "../assets/sidekick/phone-thread.png";
+import phoneDashboard from "../assets/sidekick/phone-dashboard.png";
+
+const bullets = [
+  "Send one photo — the agent does the rest",
+  "Priced from real market data",
+  "It answers every \u201csho akher si3er?\u201d",
+  "Serious buyers only, pre-qualified",
+  "Handover scheduled for you",
+];
+---
+
+<section
+  id="things"
+  class="relative bg-white flex flex-col items-center"
+  style="padding: 80px 30px 120px;"
+  aria-label="Marketplace of things"
+>
+  <!-- Glow: 998×472 pastel-green circle, opacity 0.25, blur(50px), top 80,
+       centered horizontally. Pulled verbatim from medvi's .framer-7rneyj. -->
+  <div
+    aria-hidden="true"
+    class="pointer-events-none absolute"
+    style="top: 80px; left: calc(50% - 499px); width: 998px; height: 472px; border-radius: 100%; background-color: #deede0; opacity: 0.25; filter: blur(50px); z-index: 0;"
+  ></div>
+
+  <!-- Container: max-w 1120, flex wrap, gap 50 between upper row and feature cards -->
+  <div
+    class="sk-container relative z-10 w-full flex flex-wrap items-start justify-center"
+    style="max-width: 1120px; padding: 0 30px; gap: 50px;"
+  >
+    <!-- Upper row: two columns, 40px gap. Stacks (heading first) ≤1199. -->
+    <div class="sk-row w-full flex flex-row items-start" style="gap: 40px;">
+      <!-- LEFT column: graphic + list, min-content width, 30px gap -->
+      <div class="sk-left flex flex-col items-start" style="gap: 30px; width: 370px; flex-shrink: 0;">
+        <!-- Graphic wrapper: 490px tall, overflow visible so the laptop
+             can pop above the green card. The image is pre-composited:
+             its top is transparent except for the laptop cutout, its
+             bottom embeds the original room photo. One asset, one layer. -->
+        <div class="sk-graphic relative w-full self-stretch" style="height: 490px;">
+          <!-- Rounded green card backdrop -->
+          <div
+            aria-hidden="true"
+            class="sk-greencard absolute left-0 right-0 bottom-0"
+            style="height: 335px; border-radius: 50px; background-color: #deede0;"
+          ></div>
+
+          <!-- Clip wrapper (no transform — clip-path coords are display-space).
+               Lets content extend freely above the card's top edge (so the
+               top-left lid back can pop out), but clips along the card's
+               right edge + rounded BR/BL corners (so the wrist can't
+               escape the BR curve). -->
+          <div
+            class="sk-clip absolute inset-0"
+            style="clip-path: path('M -100 -200 L 470 -200 L 470 155 L 370 155 L 370 440 A 50 50 0 0 1 320 490 L 50 490 A 50 50 0 0 1 0 440 L 0 155 L -100 155 Z');"
+          >
+            <!-- Elliptical ground shadow under the laptop. Sits behind the
+                 image in z-order so the laptop appears to cast it. -->
+            <div
+              aria-hidden="true"
+              class="absolute"
+              style="bottom: 50px; left: 50%; transform: translateX(-50%); width: 320px; height: 32px; background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.32) 0%, rgba(0, 0, 0, 0.18) 35%, transparent 75%); filter: blur(4px); pointer-events: none;"
+            ></div>
+
+            <!-- Pre-composited laptop image, bottom-anchored, scaled up
+                 and nudged down + slightly left so the laptop reads bigger
+                 and sits deeper in the green card. -->
+            <div
+              class="sk-laptop absolute left-0 right-0 bottom-0"
+              style="transform: translate(-12px, 30px) scale(1.10); transform-origin: bottom center;"
+            >
+              <Image
+                src={workspace}
+                alt="Placeholder — a laptop where the agent works"
+                width={1152}
+                height={1728}
+                loading="eager"
+                class="block w-full h-auto"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- List: padding 0 20, gap 14 -->
+        <div class="flex flex-col items-start self-stretch" style="padding: 0 20px; gap: 14px;">
+          <h4
+            class="sk-listhead text-[#1a1a1a] font-semibold"
+            style="font-family: var(--font-display); font-size: 22px; line-height: 32px; letter-spacing: -0.02em;"
+          >
+            Selling with ailb:
+          </h4>
+          <ul class="w-full grid gap-[10px]" style="grid-template-columns: 1fr;">
+            {bullets.map((b) => (
+              <li class="flex flex-row items-center" style="gap: 10px;">
+                <!-- Checkmark chip: 23×23, green-on-pastel -->
+                <svg
+                  class="shrink-0"
+                  width="23" height="23" viewBox="0 0 23 23"
+                  aria-hidden="true"
+                ><path d="M 11.141 1 C 5.538 1 1 5.538 1 11.141 C 1 16.745 5.538 21.283 11.141 21.283 C 16.745 21.283 21.283 16.745 21.283 11.141 C 21.283 5.538 16.745 1 11.141 1 Z M 16.947 8.885 L 10.634 15.198 C 10.406 15.426 10.077 15.578 9.747 15.578 C 9.417 15.578 9.087 15.426 8.86 15.198 L 5.336 11.674 C 4.829 11.167 4.829 10.381 5.336 9.874 C 5.843 9.367 6.629 9.367 7.136 9.874 L 9.748 12.485 L 15.148 7.085 C 15.655 6.578 16.441 6.578 16.948 7.085 C 17.454 7.592 17.454 8.403 16.947 8.885 Z" fill="#2e936f"/></svg>
+                <span
+                  class="text-[#1a1a1a]"
+                  style="font-family: var(--font-body); font-size: 14px; font-weight: 500; line-height: 1.4em;"
+                >
+                  {b}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <!-- sub-desktop CTA: medvi moves the section button to the
+               bottom of the stacked section, labeled Learn More -->
+          <a
+            href="https://wa.me/96178720415?text=Hi%20ailb"
+            class="sk-cta2 items-center justify-center text-white hover:opacity-95 transition-opacity"
+            style="height: 43px; padding: 0 50px; border-radius: 500px; background-color: #2e936f; font-family: var(--font-body); font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; line-height: 1.2em; width: fit-content; margin-top: 16px;"
+          >
+            Sell Something
+          </a>
+        </div>
+      </div>
+
+      <!-- RIGHT column: heading + 2 images + cards&copy, flex 1, padding-top 50, gap 30 -->
+      <div class="sk-right flex flex-col items-start" style="flex: 1 0 0; padding-top: 50px; gap: 30px;">
+        <!-- Heading block -->
+        <div class="w-full flex flex-col items-start" style="gap: 12px;">
+          <h6
+            class="text-[#1a1a1a]"
+            style="font-size: 10px; font-weight: 500; line-height: 1.5em; letter-spacing: 0.16em; text-transform: uppercase;"
+          >
+            Pillar one &mdash; marketplace of things
+          </h6>
+          <h2
+            class="sk-h2 text-[#1a1a1a] font-semibold"
+            style="font-family: var(--font-display); font-size: 50px; line-height: 1.2em; letter-spacing: -0.02em;"
+          >
+            A marketplace where <span style="color: #0d4d3a;">the agent does the selling</span>
+          </h2>
+        </div>
+
+        <!-- Two images diagonal stagger: top-right + bottom-left -->
+        <div class="sk-pair relative w-full overflow-hidden" style="height: 498px;">
+          <!-- Top-right image -->
+          <div
+            class="sk-pair-b absolute overflow-hidden"
+            style="width: 306px; height: 452px; border-radius: 20px; top: 0; right: 0;"
+          >
+            <Image
+              src={engineerFemale}
+              alt="Placeholder imagery"
+              width={604}
+              height={892}
+              loading="eager"
+              class="block w-full h-full object-cover"
+            />
+          </div>
+          <!-- Bottom-left image -->
+          <div
+            class="sk-pair-a absolute overflow-hidden"
+            style="width: 306px; height: 452px; border-radius: 20px; left: 0; bottom: 0;"
+          >
+            <Image
+              src={engineerMale}
+              alt="Placeholder imagery"
+              width={604}
+              height={892}
+              loading="eager"
+              class="block w-full h-full object-cover"
+            />
+          </div>
+        </div>
+
+        <!-- Cards & Copy -->
+        <div class="w-full flex flex-col" style="padding-top: 20px; gap: 26px;">
+          <h3
+            class="sk-h3 text-[#1a1a1a] font-semibold"
+            style="font-family: var(--font-display); font-size: 30px; line-height: 1.2em; letter-spacing: -0.02em;"
+          >
+            Buying? Tell it once.
+          </h3>
+          <p
+            class="sk-copy text-[#545454]"
+            style="font-family: var(--font-body); font-size: 14px; line-height: 1.6em;"
+          >
+            Tell the agent what you need one time. It hunts the listings,
+            verifies the seller and the item, and comes back with the real
+            options &mdash; you skip the search, the spam, and the
+            &ldquo;still available?&rdquo; dance.
+          </p>
+          <a
+            href="https://wa.me/96178720415?text=Hi%20ailb"
+            class="sk-cta1 inline-flex items-center justify-center text-white hover:opacity-95 transition-opacity"
+            style="height: 46px; padding: 0 28px; border-radius: 500px; background-color: #0d4d3a; font-family: var(--font-body); font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; width: fit-content;"
+          >
+            Sell Something
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature Cards row -->
+    <div
+      class="sk-cardsrow w-full flex flex-col"
+      style="max-width: 1120px; padding: 60px 0 0; gap: 32px;"
+    >
+      <div class="sk-cards w-full flex flex-row items-center" style="gap: 20px;">
+        <!-- Card 1 -->
+        <div
+          class="sk-card flex flex-row items-center overflow-hidden"
+          style="flex: 1 0 0; height: 160px; padding: 0 30px 0 0; gap: 30px; border-radius: 20px; background-color: #faf9f7;"
+        >
+          <div class="sk-cardimg h-full shrink-0" style="width: 170px; overflow: hidden;">
+            <Image
+              src={phoneThread}
+              alt=""
+              width={620}
+              height={1468}
+              class="block w-full h-full object-cover"
+            />
+          </div>
+          <div class="flex flex-col justify-center" style="gap: 8px;">
+            <p
+              class="font-semibold"
+              style="font-family: var(--font-display); font-size: 20px; line-height: 1.2em; letter-spacing: -0.02em; color: #242220;"
+            >
+              <span>Every buyer, </span><span style="color: #0d4d3a;">answered</span>
+            </p>
+            <p
+              class="text-[#545454]"
+              style="font-family: var(--font-body); font-size: 14px; line-height: 1.6em;"
+            >
+              The agent fields all thirty &ldquo;sho akher si3er?&rdquo;
+              messages, filters the lowballers, and only brings you the
+              serious ones.
+            </p>
+          </div>
+        </div>
+        <!-- Card 2 -->
+        <div
+          class="sk-card flex flex-row items-center overflow-hidden"
+          style="flex: 1 0 0; height: 160px; padding: 0 30px 0 0; gap: 30px; border-radius: 20px; background-color: #faf9f7;"
+        >
+          <div class="sk-cardimg h-full shrink-0" style="width: 170px; overflow: hidden;">
+            <Image
+              src={phoneDashboard}
+              alt=""
+              width={1200}
+              height={1632}
+              class="sk-cardimg2 block w-full h-full object-contain object-top"
+              style="transform: scale(1.57); transform-origin: top center;"
+            />
+          </div>
+          <div class="flex flex-col justify-center" style="gap: 8px;">
+            <p
+              class="font-semibold"
+              style="font-family: var(--font-display); font-size: 20px; line-height: 1.2em; letter-spacing: -0.02em; color: #242220;"
+            >
+              <span style="color: #0d4d3a;">Agent-priced</span><span>, agent-listed</span>
+            </p>
+            <p
+              class="text-[#545454]"
+              style="font-family: var(--font-body); font-size: 14px; line-height: 1.6em;"
+            >
+              One photo in, a full listing out: market price, honest
+              description, and answers for every question buyers ask.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Legal disclaimer tiny text -->
+      <p
+        class="text-center"
+        style="font-family: var(--font-body); font-size: 12px; line-height: 1.5em; color: #545454;"
+      >
+        Imagery is placeholder. The agent prices, lists, and negotiates;
+        money, keys, and signatures stay human &mdash; nothing is sold
+        without your yes.
+      </p>
+    </div>
+  </div>
+
+  <!-- Responsive tiers for the sk-* classes live in global.css (shared
+       with Agents/Flash/Bounty). -->
+  <script is:inline>
+    // The laptop graphic's clip-path (pop above the green card, clip at
+    // the card's right edge + rounded bottom corners) is in absolute
+    // display coords, so it must be rebuilt for the wrapper's real size.
+    // Card height: 335 desktop/tablet, 320 phone (medvi). Pop above the
+    // card stays 155px like desktop.
+    (function () {
+      var wrap = document.querySelector("#things .sk-graphic");
+      var clip = document.querySelector("#things .sk-clip");
+      if (!wrap || !clip) return;
+      function update() {
+        var W = Math.round(wrap.getBoundingClientRect().width);
+        var cardH = window.innerWidth < 810 ? 320 : 335;
+        var H = cardH + 155;
+        wrap.style.setProperty("--skcard-h", cardH + "px");
+        wrap.style.setProperty("--skwrap-h", H + "px");
+        var top = H - cardH;
+        clip.style.clipPath =
+          "path('M -100 -200 L " + (W + 100) + " -200 L " + (W + 100) + " " + top +
+          " L " + W + " " + top + " L " + W + " " + (H - 50) +
+          " A 50 50 0 0 1 " + (W - 50) + " " + H +
+          " L 50 " + H + " A 50 50 0 0 1 0 " + (H - 50) +
+          " L 0 " + top + " L -100 " + top + " Z')";
+      }
+      update();
+      window.addEventListener("resize", update);
+    })();
+  </script>
+</section>
