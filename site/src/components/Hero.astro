@@ -274,6 +274,9 @@ const cards: Card[] = [
       top: 8px !important; left: 8px !important; transform: none !important; translate: none !important;
     }
     .hero-cards .hc-sub img { object-fit: contain !important; object-position: center bottom !important; filter: none !important; }
+    /* people cutouts (cards 1-2) ride a bit high vs the object shots — nudge them down */
+    .hero-cards > li:nth-child(1) .hc-sub,
+    .hero-cards > li:nth-child(2) .hc-sub { top: 18px !important; bottom: 2px !important; }
     .hero-cards .hc-label {
       flex: 1; height: auto; background: transparent;
       padding: 0 6px 0 16px; border-radius: 0;
