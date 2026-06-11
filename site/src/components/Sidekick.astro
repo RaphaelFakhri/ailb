@@ -60,49 +60,16 @@ const bullets = [
              can pop above the green card. The image is pre-composited:
              its top is transparent except for the laptop cutout, its
              bottom embeds the original room photo. One asset, one layer. -->
-        <div class="sk-graphic relative w-full self-stretch" style="height: 490px;">
-          <!-- Rounded green card backdrop -->
-          <div
-            aria-hidden="true"
-            class="sk-greencard absolute left-0 right-0 bottom-0"
-            style="height: 335px; border-radius: 50px; background-color: #deede0;"
-          ></div>
-
-          <!-- Clip wrapper (no transform — clip-path coords are display-space).
-               Lets content extend freely above the card's top edge (so the
-               top-left lid back can pop out), but clips along the card's
-               right edge + rounded BR/BL corners (so the wrist can't
-               escape the BR curve). -->
-          <div
-            class="sk-clip absolute inset-0"
-            style="clip-path: path('M -100 -200 L 470 -200 L 470 155 L 370 155 L 370 440 A 50 50 0 0 1 320 490 L 50 490 A 50 50 0 0 1 0 440 L 0 155 L -100 155 Z');"
-          >
-            <!-- Elliptical ground shadow under the laptop. Sits behind the
-                 image in z-order so the laptop appears to cast it. -->
-            <div
-              aria-hidden="true"
-              class="absolute"
-              style="bottom: 50px; left: 50%; transform: translateX(-50%); width: 320px; height: 32px; background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.32) 0%, rgba(0, 0, 0, 0.18) 35%, transparent 75%); filter: blur(4px); pointer-events: none;"
-            ></div>
-
-            <!-- Pre-composited laptop image, bottom-anchored, scaled up
-                 and nudged down + slightly left so the laptop reads bigger
-                 and sits deeper in the green card. -->
-            <div
-              class="sk-laptop absolute left-0 right-0 bottom-0"
-              style="transform: translate(-12px, 30px) scale(1.10); transform-origin: bottom center;"
-            >
-              <Image
-              quality={70}
-                src={workspace}
-                alt="Placeholder — a laptop where the agent works"
-                width={1152}
-                height={1728}
-                loading="eager"
-                class="block w-full h-auto"
-              />
-            </div>
-          </div>
+        <div class="sk-graphic relative w-full self-stretch overflow-hidden" style="height: 490px; border-radius: 50px;">
+          <Image
+            src={workspace}
+            alt="Seller photographing his car for the agent"
+            width={1152}
+            height={1728}
+            loading="eager"
+            quality={70}
+            class="block w-full h-full object-cover object-center"
+          />
         </div>
 
         <!-- List: padding 0 20, gap 14 -->
