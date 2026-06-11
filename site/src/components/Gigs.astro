@@ -1,0 +1,186 @@
+---
+// ONE-TIME SERVICES (gigs) section — Squad's navy/pastel-blue layout, which is the
+// 1:1 port of medvi.org's "Weight Loss" layout. The only differences
+// from Sidekick here are content (team-tier messaging), palette (pastel
+// blue #e4ecf2 + navy #1d386a instead of pastel green + deep green),
+// and CTA state (waitlist pill instead of "Get Started"). All sizing
+// dimensions are held verbatim with Sidekick so the two sections read as
+// a matched pair on the page.
+//
+// Squad-specific imagery: triple-laptop overhead workspace, team
+// whiteboard huddle, founder leading strategy meeting.
+import { Image } from "astro:assets";
+import engineerMale from "../assets/squad/engineer-male.png";
+import engineerFemale from "../assets/squad/engineer-female.png";
+import workspace from "../assets/squad/workspace.png";
+
+const bullets = [
+  "Photos or a video call — the agent scopes the job",
+  "ONE final price, in writing, before anyone arrives",
+  "No day-of extras, no surprise 'winch fee'",
+  "Vetted crew, milestones tracked in chat",
+  "You confirm done — then it's settled",
+];
+---
+
+<section
+  id="gigs"
+  class="relative flex flex-col items-center"
+  style="padding: 80px 30px 120px; background-color: #faf9f7;"
+  aria-label="Marketplace of one-time services"
+>
+  <!-- Glow: 998×472 pastel-blue circle, opacity 0.25, blur(50px), top 80,
+       centered horizontally. Matches Sidekick's glow but in Squad's palette. -->
+  <div
+    aria-hidden="true"
+    class="pointer-events-none absolute"
+    style="top: 80px; left: calc(50% - 499px); width: 998px; height: 472px; border-radius: 100%; background-color: #e4ecf2; opacity: 0.35; filter: blur(50px); z-index: 0;"
+  ></div>
+
+  <!-- Container: max-w 1120, flex wrap, gap 50 between upper row and feature cards -->
+  <div
+    class="sk-container relative z-10 w-full flex flex-wrap items-start justify-center"
+    style="max-width: 1120px; padding: 0 30px; gap: 50px;"
+  >
+    <!-- Upper row: two columns, 40px gap -->
+    <div class="sk-row w-full flex flex-row items-start" style="gap: 40px;">
+      <!-- LEFT column: graphic + list, min-content width, 30px gap -->
+      <div class="sk-left flex flex-col items-start" style="gap: 30px; width: 370px; flex-shrink: 0;">
+        <!-- Graphic wrapper: 490px tall, relative, clipped -->
+        <div class="relative w-full overflow-hidden self-stretch" style="height: 490px;">
+          <!-- Rounded card frame sitting at the bottom — image hangs
+               over its top edge for the "subject-popping-out" treatment. -->
+          <div
+            aria-hidden="true"
+            class="absolute left-0 right-0 bottom-0"
+            style="height: 335px; border-radius: 50px; background-color: #e4ecf2;"
+          ></div>
+          <div
+            class="absolute top-0 left-1/2 -translate-x-1/2 flex flex-col items-center justify-end"
+            style="width: 97%; height: 100%;"
+          >
+            <Image
+              src={workspace}
+              alt="AI agents working a queue in parallel"
+              width={1872}
+              height={1056}
+              loading="lazy"
+              class="block w-full h-full object-cover object-center"
+              style="border-radius: 40px;"
+            />
+          </div>
+        </div>
+
+        <!-- List: padding 0 20, gap 14 -->
+        <div class="flex flex-col items-start self-stretch" style="padding: 0 20px; gap: 14px;">
+          <h4
+            class="sk-listhead text-[#1a1a1a] font-semibold"
+            style="font-family: var(--font-display); font-size: 22px; line-height: 32px; letter-spacing: -0.02em;"
+          >
+            For customers:
+          </h4>
+          <ul class="w-full grid gap-[10px]" style="grid-template-columns: 1fr;">
+            {bullets.map((b) => (
+              <li class="flex flex-row items-center" style="gap: 10px;">
+                <!-- Checkmark chip: 23×23, navy-on-pastel-blue -->
+                <svg
+                  class="shrink-0"
+                  width="23" height="23" viewBox="0 0 23 23"
+                  aria-hidden="true"
+                ><path d="M 11.141 1 C 5.538 1 1 5.538 1 11.141 C 1 16.745 5.538 21.283 11.141 21.283 C 16.745 21.283 21.283 16.745 21.283 11.141 C 21.283 5.538 16.745 1 11.141 1 Z M 16.947 8.885 L 10.634 15.198 C 10.406 15.426 10.077 15.578 9.747 15.578 C 9.417 15.578 9.087 15.426 8.86 15.198 L 5.336 11.674 C 4.829 11.167 4.829 10.381 5.336 9.874 C 5.843 9.367 6.629 9.367 7.136 9.874 L 9.748 12.485 L 15.148 7.085 C 15.655 6.578 16.441 6.578 16.948 7.085 C 17.454 7.592 17.454 8.403 16.947 8.885 Z" fill="#1d386a"/></svg>
+                <span
+                  class="text-[#1a1a1a]"
+                  style="font-family: var(--font-body); font-size: 14px; font-weight: 500; line-height: 1.4em;"
+                >
+                  {b}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <a href="/gigs/"
+            class="sk-cta2 items-center justify-center text-white"
+            style="height: 43px; padding: 0 50px; border-radius: 500px; background-color: #1d386a; font-family: var(--font-body); font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; line-height: 1.2em; width: fit-content; margin-top: 16px;"
+          >
+            Browse One-Time Jobs
+          </a>
+        </div>
+      </div>
+
+      <!-- RIGHT column: heading + 2 images + cards&copy, flex 1, padding-top 50, gap 30 -->
+      <div class="sk-right flex flex-col items-start" style="flex: 1 0 0; padding-top: 50px; gap: 30px;">
+        <!-- Heading block -->
+        <div class="w-full flex flex-col items-start" style="gap: 12px;">
+          <h6
+            class="text-[#1a1a1a]"
+            style="font-size: 10px; font-weight: 500; line-height: 1.5em; letter-spacing: 0.16em; text-transform: uppercase;"
+          >
+            AI workforce — coming soon
+          </h6>
+          <h2
+            class="sk-h2 text-[#1a1a1a] font-semibold"
+            style="font-family: var(--font-display); font-size: 50px; line-height: 1.2em; letter-spacing: -0.02em;"
+          >
+            One job, <span style="color: #1d386a;">one quote &mdash; in writing</span>
+          </h2>
+        </div>
+
+        <!-- Two images diagonal stagger: top-right + bottom-left -->
+        <div class="sk-pair relative w-full overflow-hidden" style="height: 498px;">
+          <div
+            class="sk-pair-b absolute overflow-hidden"
+            style="width: 306px; height: 452px; border-radius: 20px; top: 0; right: 0;"
+          >
+            <Image
+              src={engineerFemale}
+              alt="An engineer pairing with a teammate"
+              width={604}
+              height={892}
+              loading="lazy"
+              class="block w-full h-full object-cover"
+            />
+          </div>
+          <div
+            class="sk-pair-a absolute overflow-hidden"
+            style="width: 306px; height: 452px; border-radius: 20px; left: 0; bottom: 0;"
+          >
+            <Image
+              src={engineerMale}
+              alt="A senior engineer, at work"
+              width={604}
+              height={892}
+              loading="lazy"
+              class="block w-full h-full object-cover"
+            />
+          </div>
+        </div>
+
+        <!-- Cards & Copy -->
+        <div class="w-full flex flex-col" style="padding-top: 20px; gap: 26px;">
+          <h3
+            class="sk-h3 text-[#1a1a1a] font-semibold"
+            style="font-family: var(--font-display); font-size: 30px; line-height: 1.2em; letter-spacing: -0.02em;"
+          >
+            For workers: jobs near you, quoted fairly.
+          </h3>
+          <p
+            class="sk-copy text-[#545454]"
+            style="font-family: var(--font-body); font-size: 14px; line-height: 1.6em;"
+          >
+            Moving day, a dead water heater, a deep clean before the in-laws
+            land — one-time jobs the agent prices once and protects. Workers
+            pick up jobs near them with the quote already agreed, and get
+            paid without chasing anyone. El se3er huwe el se3er.
+          </p>
+          <a
+            href="/gigs/"
+            class="sk-cta1 inline-flex items-center justify-center text-white hover:opacity-95 transition-opacity"
+            style="height: 46px; padding: 0 28px; border-radius: 500px; background-color: #1d386a; font-family: var(--font-body); font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; width: fit-content;"
+          >
+            Browse One-Time Jobs
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
