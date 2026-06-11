@@ -15,6 +15,7 @@ type Card = {
   label: string;
   tagline: string;
   href: string;
+  hint?: string; // tiny extra line (e.g. the /gov/ "requires login" lock)
   image: ImageMetadata;
   // Flat color of the top "squircle" block (not a gradient — reference uses solid pastels)
   blockBg: string;
@@ -37,9 +38,9 @@ type Card = {
 
 const cards: Card[] = [
   {
-    label: "Things",
-    tagline: "the agent sells it",
-    href: "#things",
+    label: "Product Marketplace",
+    tagline: "Cars, phones, furniture — listed and priced by the agent.",
+    href: "/things/",
     image: sidekickImg,
     blockBg: "#deede0",  // soft green
     imgW: 188,
@@ -49,9 +50,9 @@ const cards: Card[] = [
     imgPos: "bottom",
   },
   {
-    label: "Services",
-    tagline: "onboard by talking",
-    href: "#services",
+    label: "Services Marketplace",
+    tagline: "Electricians, tutors, beauty — real calendars, fixed quotes.",
+    href: "/services/",
     image: squadImg,
     blockBg: "#e4ecf2",  // soft blue
     imgW: 199,
@@ -61,21 +62,9 @@ const cards: Card[] = [
     imgPos: "bottom",
   },
   {
-    label: "Government",
-    tagline: "go once, prepared",
-    href: "#government",
-    image: bountyImg,
-    blockBg: "#f2e6ec",  // soft pink
-    imgW: 180,
-    imgAspect: 1.90,      // landscape book
-    imgTopOffset: 4,
-    imgFit: "contain",
-    imgPos: "bottom",
-  },
-  {
-    label: "How it works",
-    tagline: "you talk, it works",
-    href: "#craft",
+    label: "One-time Services",
+    tagline: "Moving, repairs, urgent jobs — one quote, in writing.",
+    href: "/gigs/",
     image: flashImg,
     blockBg: "#f2ebe1",  // soft taupe
     imgW: 110,
@@ -84,6 +73,19 @@ const cards: Card[] = [
     imgFit: "contain",
     imgPos: "bottom",
     imgShadow: "drop-shadow(0 10px 18px rgba(0,0,0,0.25)) drop-shadow(0 4px 6px rgba(0,0,0,0.15))",
+  },
+  {
+    label: "Government Services",
+    tagline: "Visa files, ikhraj qaid, mécanique — go once, with everything.",
+    href: "/gov/",
+    hint: "🔒 requires login",
+    image: bountyImg,
+    blockBg: "#f2e6ec",  // soft pink
+    imgW: 180,
+    imgAspect: 1.90,      // landscape book
+    imgTopOffset: 4,
+    imgFit: "contain",
+    imgPos: "bottom",
   },
 ];
 ---
@@ -148,7 +150,7 @@ const cards: Card[] = [
       </h1>
 
       <p class="hero-enter hero-enter-3 text-center max-w-[700px] text-[16px] font-normal text-white leading-[25px]">
-        One agent that sells your stuff, finds your people, and fights
+        One agent that sells your stuff, books your people, and preps
         your paperwork &mdash; on WhatsApp or right here.
       </p>
 
@@ -226,9 +228,19 @@ const cards: Card[] = [
                  16px Red Hat Text 600, letter-spacing -0.02em, line-height 20px,
                  color #242220, arrow 15×13. -->
             <div class="hc-label h-[70px] rounded-b-[20px] bg-white text-[#242220] px-5 flex items-center justify-between gap-2">
-              <p class="font-display font-semibold text-[16px] tracking-[-0.02em] leading-[20px] truncate">
-                {c.label}
-              </p>
+              <div class="min-w-0">
+                <p class="font-display font-semibold text-[15px] tracking-[-0.02em] leading-[19px] truncate">
+                  {c.label}
+                </p>
+                <p class="text-[11px] leading-[15px] text-[#6f6b66] truncate">
+                  {c.tagline}
+                </p>
+                {c.hint && (
+                  <p class="text-[10px] leading-[14px] font-medium text-[#8a857e]">
+                    {c.hint}
+                  </p>
+                )}
+              </div>
               <svg width="15" height="13" viewBox="0 0 15 13" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" class="shrink-0" aria-hidden="true"><path d="M1 6.5h12.5M9 1l5 5.5L9 12"/></svg>
             </div>
           </a>

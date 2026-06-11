@@ -1,0 +1,344 @@
+---
+// Shared marketplace page shell — used by /things/, /services/, /gigs/,
+// /gov/. Navy hero strip (same gradient as the index) + a client-side
+// fetched listings grid, so the page itself stays fully static.
+//
+// Listings: GET /api/listings?type=<type>
+//   -> { listings: [{ id, type, title, price, location, desc, tags[],
+//                     seller, agentVerified, ts }] }
+// Chat hooks (ChatWidget is mounted by the Base layout):
+//   - [data-open-chat] opens the chat
+//   - window.ailbChat.open(prefill) opens it with a prefilled input
+//   - window.ailbChat.login() opens the WhatsApp-code login modal
+//   - "ailb:login" fires on document after a successful login
+import AilbLogo from "./AilbLogo.astro";
+import Footer from "./Footer.astro";
+import MenuDrawer from "./MenuDrawer.astro";
+
+interface Props {
+  type: "product" | "service" | "gig" | "gov";
+  eyebrow: string;
+  title: string;
+  promise: string;
+  cta: string;       // gold hero CTA — opens the chat
+  askLabel: string;  // per-card button label
+  gated?: boolean;   // /gov/: require login before loading the grid
+}
+const { type, eyebrow, title, promise, cta, askLabel, gated = false } = Astro.props;
+
+const navItems = [
+  { label: "Things", href: "/things/" },
+  { label: "Services", href: "/services/" },
+  { label: "One-time", href: "/gigs/" },
+  { label: "Government 🔒", href: "/gov/" },
+  { label: "How it works", href: "/#craft" },
+];
+---
+
+<!-- Navy band: header + hero strip (same gradient as the index hero) -->
+<div
+  class="relative text-white"
+  style="background: linear-gradient(166deg, #1d386a 0%, #080f1c 100%);"
+>
+  <header class="absolute inset-x-0 top-0 z-40">
+    <div class="max-w-[1120px] mx-auto px-[30px] h-[60px] flex items-center justify-between">
+      <a href="/" class="inline-block text-[16px] md:text-[20px]">
+        <AilbLogo />
+      </a>
+      <nav class="hidden md:flex items-center gap-7 text-[13px] font-medium" aria-label="Marketplaces">
+        {navItems.map((n) => (
+          <a href={n.href} class="hover:opacity-80 transition-opacity">{n.label}</a>
+        ))}
+      </nav>
+      <button
+        type="button"
+        aria-label="Open menu"
+        data-menu-open
+        class="cursor-pointer flex flex-col items-center justify-center gap-[7px] pl-3 py-3"
+      >
+        <span class="block w-[22px] h-[2px] bg-current rounded-full"></span>
+        <span class="block w-[22px] h-[2px] bg-current rounded-full"></span>
+      </button>
+    </div>
+  </header>
+
+  <div class="max-w-[1120px] mx-auto px-[30px] pt-[120px] pb-[64px] flex flex-col items-center text-center gap-4">
+    <p class="text-[10px] font-medium uppercase text-white/85" style="letter-spacing: 0.16em;">
+      {eyebrow}
+    </p>
+    <h1
+      class="font-semibold text-[36px] md:text-[54px] tracking-[-0.02em]"
+      style="line-height: 1.05em;"
+    >
+      {title}
+    </h1>
+    <p class="max-w-[640px] text-[15px] leading-[24px] text-white/85">{promise}</p>
+    <button
+      type="button"
+      data-open-chat
+      class="cursor-pointer inline-flex items-center justify-center mt-2 hover:opacity-95 transition-opacity"
+      style="height: 46px; padding: 0 32px; border-radius: 500px; background-color: #f2c84b; color: #0d1b33; font-family: var(--font-body); font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;"
+    >
+      {cta}
+    </button>
+  </div>
+</div>
+
+<section class="bg-white" style="padding: 50px 30px 120px;" aria-label={`${title} listings`}>
+  <div class="max-w-[1120px] mx-auto">
+    {gated && (
+      <div id="mk-locked" class="mk-center mk-hidden">
+        <div class="mk-panel">
+          <div style="font-size: 34px;" aria-hidden="true">🔒</div>
+          <h2>Government files are personal</h2>
+          <p>Log in with WhatsApp to continue — same login as the chat, and your number stays private.</p>
+          <button id="mk-login" type="button" class="mk-gold-pill">Log in with WhatsApp</button>
+        </div>
+      </div>
+    )}
+
+    <div id="mk-error" class="mk-center mk-hidden">
+      <div class="mk-panel">
+        <h2>Couldn't load listings</h2>
+        <p>Refresh or ask the bot — it knows everything that's live.</p>
+        <button type="button" data-open-chat class="mk-gold-pill">Ask the bot</button>
+      </div>
+    </div>
+
+    <div id="mk-empty" class="mk-center mk-hidden">
+      <div class="mk-panel">
+        <h2>Nothing listed yet</h2>
+        <p>Be the first — the chat handles the rest.</p>
+        <button type="button" data-open-chat class="mk-gold-pill">{cta}</button>
+      </div>
+    </div>
+
+    <!-- Skeletons render statically; the script swaps in real cards. -->
+    <ul id="mk-grid" class="mk-grid" aria-live="polite">
+      {[1, 2, 3, 4, 5, 6].map(() => (
+        <li class="mk-card" aria-hidden="true">
+          <div class="mk-skel-line" style="width: 62%; height: 18px;"></div>
+          <div class="mk-skel-line" style="width: 34%;"></div>
+          <div class="mk-skel-line" style="width: 100%;"></div>
+          <div class="mk-skel-line" style="width: 82%;"></div>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<Footer />
+
+<MenuDrawer
+  items={navItems}
+  foot={[
+    { label: "Chat on WhatsApp", href: "https://wa.me/96178720415?text=Hi%20ailb", icon: "chat" },
+    { label: "GitHub", href: "https://github.com/RaphaelFakhri/ailb", icon: "arrow" },
+  ]}
+/>
+
+<!-- Global (not scoped): the listings script creates mk-* nodes at runtime,
+     which Astro's scoped styles wouldn't match. -->
+<style is:global>
+  .mk-hidden { display: none !important; }
+
+  .mk-grid {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+  }
+  @media (max-width: 1023.98px) { .mk-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 719.98px)  { .mk-grid { grid-template-columns: 1fr; } }
+
+  .mk-card {
+    display: flex; flex-direction: column; gap: 10px;
+    padding: 24px; border-radius: 20px;
+    background: #faf9f7; border: 1px solid #efece6;
+    font-family: var(--font-body, "Red Hat Text", ui-sans-serif, system-ui, sans-serif);
+  }
+  .mk-badge {
+    align-self: flex-start; display: inline-flex; align-items: center;
+    padding: 3px 10px; border-radius: 100px;
+    background: #f2c84b; color: #1a1a1a;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.02em;
+  }
+  .mk-card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  .mk-title {
+    margin: 0; font-family: var(--font-display, sans-serif);
+    font-size: 18px; font-weight: 600; letter-spacing: -0.02em;
+    line-height: 1.3em; color: #1a1a1a;
+  }
+  .mk-price { white-space: nowrap; font-weight: 700; font-size: 15px; color: #1d386a; }
+  .mk-meta { margin: 0; font-size: 12.5px; color: #545454; }
+  .mk-desc { margin: 0; font-size: 14px; line-height: 1.6em; color: #545454; }
+  .mk-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .mk-tag {
+    padding: 3px 10px; border-radius: 100px;
+    background: #f1ebdf; color: #38312c; font-size: 11px; font-weight: 500;
+  }
+  .mk-ask {
+    margin-top: auto; align-self: flex-start;
+    display: inline-flex; align-items: center; justify-content: center;
+    height: 38px; padding: 0 20px; border-radius: 500px;
+    border: 1px solid #1d386a; background: transparent; color: #1d386a;
+    font-family: var(--font-body, sans-serif); font-size: 11px; font-weight: 600;
+    letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+  .mk-ask:hover { background: #1d386a; color: #ffffff; }
+
+  .mk-center { display: flex; justify-content: center; padding: 30px 0; }
+  .mk-panel {
+    max-width: 420px; text-align: center;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    padding: 40px 30px; border-radius: 20px;
+    background: #faf9f7; border: 1px solid #efece6;
+    font-family: var(--font-body, sans-serif);
+  }
+  .mk-panel h2 {
+    margin: 0; font-family: var(--font-display, sans-serif);
+    font-size: 22px; font-weight: 600; letter-spacing: -0.02em; color: #1a1a1a;
+  }
+  .mk-panel p { margin: 0; font-size: 14px; line-height: 1.6em; color: #545454; }
+  .mk-gold-pill {
+    margin-top: 8px;
+    display: inline-flex; align-items: center; justify-content: center;
+    height: 43px; padding: 0 28px; border-radius: 500px; border: none;
+    background: #f2c84b; color: #0d1b33; cursor: pointer;
+    font-family: var(--font-body, sans-serif); font-size: 12px; font-weight: 600;
+    letter-spacing: 0.05em; text-transform: uppercase;
+    transition: opacity 0.2s ease;
+  }
+  .mk-gold-pill:hover { opacity: 0.92; }
+
+  .mk-skel-line {
+    height: 12px; border-radius: 6px;
+    background: linear-gradient(90deg, #eee9e0 25%, #f7f4ee 50%, #eee9e0 75%);
+    background-size: 200% 100%;
+    animation: mk-shimmer 1.4s ease infinite;
+  }
+  @keyframes mk-shimmer { to { background-position: -200% 0; } }
+  @media (prefers-reduced-motion: reduce) { .mk-skel-line { animation: none; } }
+</style>
+
+<script is:inline define:vars={{ type, gated, askLabel }}>
+(function () {
+  "use strict";
+
+  var grid = document.getElementById("mk-grid");
+  var errorEl = document.getElementById("mk-error");
+  var emptyEl = document.getElementById("mk-empty");
+  var lockedEl = document.getElementById("mk-locked");
+  var loginBtn = document.getElementById("mk-login");
+
+  function show(n) { if (n) n.classList.remove("mk-hidden"); }
+  function hide(n) { if (n) n.classList.add("mk-hidden"); }
+
+  function openChat(prefill) {
+    if (window.ailbChat) window.ailbChat.open(prefill);
+  }
+
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text) n.textContent = text;
+    return n;
+  }
+
+  function card(l) {
+    var li = el("li", "mk-card");
+    if (l.agentVerified) li.appendChild(el("span", "mk-badge", "✓ agent-verified"));
+
+    var head = el("div", "mk-card-head");
+    head.appendChild(el("h3", "mk-title", l.title || "Untitled"));
+    // gov listings are guided files — no price/seller on those cards
+    if (!gated && l.price) head.appendChild(el("span", "mk-price", l.price));
+    li.appendChild(head);
+
+    var meta = [];
+    if (l.location) meta.push(l.location);
+    if (!gated && l.seller) meta.push("by " + l.seller);
+    if (meta.length) li.appendChild(el("p", "mk-meta", meta.join(" · ")));
+
+    if (l.desc) li.appendChild(el("p", "mk-desc", l.desc));
+
+    if (l.tags && l.tags.length) {
+      var tags = el("div", "mk-tags");
+      l.tags.forEach(function (t) { tags.appendChild(el("span", "mk-tag", t)); });
+      li.appendChild(tags);
+    }
+
+    var ask = el("button", "mk-ask", askLabel);
+    ask.type = "button";
+    ask.addEventListener("click", function () {
+      openChat(
+        gated
+          ? "Start my " + (l.title || "government") + " file. "
+          : 'About "' + (l.title || "") + '" — '
+      );
+    });
+    li.appendChild(ask);
+    return li;
+  }
+
+  function load() {
+    hide(errorEl); hide(emptyEl); show(grid);
+    fetch("/api/listings?type=" + encodeURIComponent(type))
+      .then(function (r) {
+        if (!r.ok) throw new Error("http " + r.status);
+        return r.json();
+      })
+      .then(function (d) {
+        var list = (d && d.listings) || [];
+        grid.innerHTML = "";
+        if (!list.length) { hide(grid); show(emptyEl); return; }
+        list.forEach(function (l) { grid.appendChild(card(l)); });
+      })
+      .catch(function () {
+        grid.innerHTML = "";
+        hide(grid); show(errorEl);
+      });
+  }
+
+  if (!gated) { load(); return; }
+
+  // ---- /gov/ login gate: validate ailb_token via /api/me ----
+  var unlocked = false;
+  var lastInvalid = null; // don't re-hit /api/me with a known-bad token
+  var pollId = null;
+
+  if (loginBtn) {
+    loginBtn.addEventListener("click", function () {
+      if (window.ailbChat && window.ailbChat.login) window.ailbChat.login();
+    });
+  }
+
+  function showLocked() { hide(grid); hide(errorEl); hide(emptyEl); show(lockedEl); }
+
+  function unlock() {
+    if (unlocked) return;
+    unlocked = true;
+    if (pollId) clearInterval(pollId);
+    hide(lockedEl);
+    load();
+  }
+
+  function check() {
+    if (unlocked) return;
+    var t = localStorage.getItem("ailb_token");
+    if (!t) { showLocked(); return; }
+    if (t === lastInvalid) return;
+    fetch("/api/me", { headers: { authorization: "Bearer " + t } })
+      .then(function (r) {
+        if (r.ok) unlock();
+        else { lastInvalid = t; showLocked(); }
+      })
+      .catch(function () { showLocked(); });
+  }
+
+  // ChatWidget dispatches "ailb:login" after a successful login; the 2s
+  // poll is a fallback (e.g. login completed in another tab).
+  document.addEventListener("ailb:login", check);
+  pollId = setInterval(check, 2000);
+  check(); // skeletons stay up while a stored token validates
+})();
+</script>

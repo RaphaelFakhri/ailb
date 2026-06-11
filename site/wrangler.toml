@@ -8,3 +8,7 @@ RELAY_URL = "https://ailb-relay.symbai.dev"
 [[kv_namespaces]]
 binding = "SESSIONS"
 id = "7a5ffab6a07e47048c20e0eb76d31f46"
+
+[[kv_namespaces]]
+binding = "LISTINGS"
+id = "de422246c3744a398972ec8b1889ef15"

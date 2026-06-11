@@ -13,8 +13,11 @@
 //
 // Opening the chat from anywhere:
 //   - any element with [data-open-chat]
-//   - window.ailbChat.open()
+//   - window.ailbChat.open()             — optional: open("prefill text")
+//   - window.ailbChat.login()            — opens the WhatsApp-code modal
 //   - document.dispatchEvent(new CustomEvent("ailb:open-chat"))
+//     (detail: { prefill } supported)
+// On successful login the widget dispatches "ailb:login" on document.
 ---
 
 <!-- floating chat button -->
@@ -234,6 +237,8 @@
     localStorage.setItem(TOKEN_KEY, token);
     if (phone) localStorage.setItem(PHONE_KEY, phone);
     renderAuth();
+    // additive: lets pages (e.g. the /gov/ gate) react to a fresh login
+    document.dispatchEvent(new CustomEvent("ailb:login"));
   }
   function clearSession() {
     localStorage.removeItem(TOKEN_KEY);
@@ -302,12 +307,19 @@
   var pendingMessage = null; // message waiting for login
   var greeted = false;
 
-  function openChat() {
+  function openChat(prefill) {
     chatPanel.classList.remove("cw-hidden");
     chatFab.classList.add("cw-hidden");
     if (!greeted) {
       greeted = true;
       addMsg("agent", "Ahla! I'm ailb — same agent as on WhatsApp.\nSell something, find someone, or start a paperwork file. Shu badak?");
+    }
+    // additive prefill API: ailbChat.open("text"). The string guard keeps
+    // [data-open-chat] click handlers (which pass the click event) inert.
+    if (typeof prefill === "string" && prefill) {
+      chatInput.value = prefill;
+      chatInput.style.height = "auto";
+      chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + "px";
     }
     chatInput.focus();
   }
@@ -319,8 +331,11 @@
   document.querySelectorAll("[data-open-chat]").forEach(function (el) {
     el.addEventListener("click", openChat);
   });
-  document.addEventListener("ailb:open-chat", openChat);
-  window.ailbChat = { open: openChat, close: closeChat };
+  document.addEventListener("ailb:open-chat", function (e) {
+    openChat(e && e.detail && e.detail.prefill);
+  });
+  // openLogin is a hoisted function declaration further down — safe here.
+  window.ailbChat = { open: openChat, close: closeChat, login: openLogin };
   $("chat-close").addEventListener("click", closeChat);
 
   function addMsg(kind, text) {
