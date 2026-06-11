@@ -4,9 +4,9 @@
 // agent. All dimensions held in lockstep with the sibling sections so the
 // page reads as one family. Imagery is placeholder.
 import { Image } from "astro:assets";
-import engineerMale from "../assets/services/pair-1.png";
-import engineerFemale from "../assets/services/pair-2.png";
-import workspace from "../assets/services/workspace.png";
+import engineerMale from "../assets/services/pair-1.webp";
+import engineerFemale from "../assets/services/pair-2.webp";
+import workspace from "../assets/services/workspace.webp";
 
 const bullets = [
   "The agent interviews you about your skills",
@@ -54,6 +54,7 @@ const bullets = [
               width={619}
               height={823}
               loading="lazy"
+              quality={70}
               class="sk-photoimg block w-full h-full object-cover object-top"
               style="aspect-ratio: 0.7521; border-radius: 40px;"
             />
@@ -122,6 +123,7 @@ const bullets = [
               width={604}
               height={892}
               loading="lazy"
+              quality={70}
               class="block w-full h-full object-cover"
             />
           </div>
@@ -135,6 +137,7 @@ const bullets = [
               width={604}
               height={892}
               loading="lazy"
+              quality={70}
               class="block w-full h-full object-cover"
             />
           </div>

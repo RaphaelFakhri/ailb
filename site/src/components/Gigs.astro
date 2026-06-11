@@ -10,9 +10,9 @@
 // Squad-specific imagery: triple-laptop overhead workspace, team
 // whiteboard huddle, founder leading strategy meeting.
 import { Image } from "astro:assets";
-import engineerMale from "../assets/gigs/pair-2.png";
-import engineerFemale from "../assets/gigs/pair-1.png";
-import workspace from "../assets/gigs/workspace.png";
+import engineerMale from "../assets/gigs/pair-2.webp";
+import engineerFemale from "../assets/gigs/pair-1.webp";
+import workspace from "../assets/gigs/workspace.webp";
 
 const bullets = [
   "Photos or a video call — the agent scopes the job",
@@ -62,9 +62,10 @@ const bullets = [
             <Image
               src={workspace}
               alt="AI agents working a queue in parallel"
-              width={1872}
+              width={1240}
               height={1056}
               loading="lazy"
+              quality={70}
               class="block w-full h-full object-cover object-center"
               style="border-radius: 40px;"
             />
@@ -136,6 +137,7 @@ const bullets = [
               width={604}
               height={892}
               loading="lazy"
+              quality={70}
               class="block w-full h-full object-cover"
             />
           </div>
@@ -149,6 +151,7 @@ const bullets = [
               width={604}
               height={892}
               loading="lazy"
+              quality={70}
               class="block w-full h-full object-cover"
             />
           </div>

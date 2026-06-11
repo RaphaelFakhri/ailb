@@ -18,10 +18,10 @@
 // Content adapted for ailb's THINGS pillar (marketplace of things).
 // Images are kept as placeholders from the original design.
 import { Image } from "astro:assets";
-import engineerMale from "../assets/things/pair-2.png";
-import engineerFemale from "../assets/things/pair-1.png";
-import workspace from "../assets/things/workspace.png";  // pre-composited: top transparent (laptop cutout), bottom full photo
-import phoneThread from "../assets/things/phone-thread.png";
+import engineerMale from "../assets/things/pair-2.webp";
+import engineerFemale from "../assets/things/pair-1.webp";
+import workspace from "../assets/things/workspace.webp";  // pre-composited: top transparent (laptop cutout), bottom full photo
+import phoneThread from "../assets/things/phone-thread.webp";
 import phoneDashboard from "../assets/sidekick/phone-dashboard.png";
 
 const bullets = [
@@ -93,6 +93,7 @@ const bullets = [
               style="transform: translate(-12px, 30px) scale(1.10); transform-origin: bottom center;"
             >
               <Image
+              quality={70}
                 src={workspace}
                 alt="Placeholder — a laptop where the agent works"
                 width={1152}
@@ -168,6 +169,7 @@ const bullets = [
             style="width: 306px; height: 452px; border-radius: 20px; top: 0; right: 0;"
           >
             <Image
+              quality={70}
               src={engineerFemale}
               alt="Placeholder imagery"
               width={604}
@@ -182,6 +184,7 @@ const bullets = [
             style="width: 306px; height: 452px; border-radius: 20px; left: 0; bottom: 0;"
           >
             <Image
+              quality={70}
               src={engineerMale}
               alt="Placeholder imagery"
               width={604}
@@ -233,6 +236,7 @@ const bullets = [
         >
           <div class="sk-cardimg h-full shrink-0" style="width: 170px; overflow: hidden;">
             <Image
+              quality={70}
               src={phoneThread}
               alt=""
               width={620}
@@ -264,6 +268,7 @@ const bullets = [
         >
           <div class="sk-cardimg h-full shrink-0" style="width: 170px; overflow: hidden;">
             <Image
+              quality={70}
               src={phoneDashboard}
               alt=""
               width={1200}

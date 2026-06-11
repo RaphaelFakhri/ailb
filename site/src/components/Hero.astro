@@ -6,10 +6,10 @@
 // PNG originals are 500KB–1.1MB each; webp at the actual render
 // dimensions is typically 20–80KB).
 import { Image } from "astro:assets";
-import sidekickImg from "../assets/offerings/hero-things.png";
-import squadImg from "../assets/offerings/hero-services.png";
-import flashImg from "../assets/offerings/hero-gigs.png";
-import bountyImg from "../assets/offerings/hero-gov.png";
+import sidekickImg from "../assets/offerings/hero-things.webp";
+import squadImg from "../assets/offerings/hero-services.webp";
+import flashImg from "../assets/offerings/hero-gigs.webp";
+import bountyImg from "../assets/offerings/hero-gov.webp";
 
 type Card = {
   label: string;
@@ -217,7 +217,7 @@ const cards: Card[] = [
                   loading="eager"
                   fetchpriority="high"
                   format="webp"
-                  quality={82}
+                  quality={70}
                   class="block w-full h-full pointer-events-none"
                   style={`object-fit: ${c.imgFit}; object-position: ${c.imgPos};${c.imgShadow ? ` filter: ${c.imgShadow};` : ""}`}
                 />
