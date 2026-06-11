@@ -260,23 +260,28 @@ const cards: Card[] = [
     .hero-cards > li { flex: none !important; width: 100%; min-width: 0 !important; }
     .hero-cards a {
       display: flex; flex-direction: row; align-items: center;
-      height: 85px; padding: 0 15px 0 14px; gap: 0;
+      height: auto; min-height: 85px; padding: 9px 15px 9px 12px; gap: 0;
     }
     .hero-cards .hc-block {
-      width: 78px; height: 85px !important; flex-shrink: 0;
+      width: 78px; height: auto !important; align-self: stretch; min-height: 78px; flex-shrink: 0;
       border-radius: 12px; overflow: hidden;
     }
     /* the pop-out subject treatment is desktop-only — inside the small
        thumbnail the image just fills the block */
     .hero-cards .hc-sub {
-      position: absolute; inset: 0 !important;
+      position: absolute; inset: 8px !important;
       width: auto !important; aspect-ratio: auto !important;
-      top: 0 !important; left: 0 !important; transform: none !important;
+      top: 8px !important; left: 8px !important; transform: none !important; translate: none !important;
     }
-    .hero-cards .hc-sub img { object-fit: contain !important; object-position: center bottom !important; filter: none !important; }
+    .hero-cards .hc-sub img { object-fit: contain !important; object-position: center center !important; filter: none !important; }
     .hero-cards .hc-label {
       flex: 1; height: auto; background: transparent;
-      padding: 0 8px 0 26px; border-radius: 0;
+      padding: 0 6px 0 16px; border-radius: 0;
+      min-width: 0; /* lets the text column shrink so lines wrap instead of overflowing the tray */
+    }
+    /* phone: wrap the tagline (2 short lines) instead of truncating off-card */
+    .hero-cards .hc-label .truncate {
+      white-space: normal; overflow: visible; text-overflow: clip;
     }
     /* clones exist only for the tablet carousel */
     .hero-cards .hc-clone { display: none !important; }
