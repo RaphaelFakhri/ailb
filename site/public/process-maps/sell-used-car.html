@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Selling my used car — ailb reality map</title>
+<style>
+  :root{
+    --bg:#0d0d10;
+    --wall:#141419;
+    --text:#e8e8ea;
+    --muted:#8a8a92;
+    --line:#26262d;
+    --ink:#181410;
+    --gold:#f0c33c;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.45;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:40px 22px 90px;}
+
+  .crumb{font-size:13px;margin:0 0 18px;}
+  .crumb a{color:var(--muted);text-decoration:none;}
+  .crumb a:hover{color:var(--gold);}
+  .pillar-tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+    padding:5px 10px;border-radius:6px;margin-bottom:14px;border:1px solid;}
+  .pillar-products{color:#6db5ff;border-color:#27405e;background:#101a26;}
+  .pillar-services{color:#7ee0a3;border-color:#1f4a30;background:#0f1f16;}
+  .pillar-gov{color:#f0a35c;border-color:#5e3f1d;background:#221708;}
+
+  header.intro h1{font-size:30px;margin:0 0 10px;font-weight:700;letter-spacing:-.01em;}
+  header.intro p{margin:0;color:var(--muted);font-size:16px;max-width:760px;}
+  .persona{margin-top:14px;font-size:14.5px;color:var(--text);background:var(--wall);
+    border:1px solid var(--line);border-radius:10px;padding:12px 16px;max-width:760px;}
+  .persona b{color:var(--gold);}
+
+  /* Metrics bar */
+  .metrics{display:flex;gap:12px;flex-wrap:wrap;margin:26px 0 4px;}
+  .metric{background:var(--wall);border:1px solid var(--line);border-radius:10px;
+    padding:12px 18px;min-width:140px;}
+  .metric .label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;}
+  .metric .val{font-size:22px;font-weight:700;margin-top:3px;}
+  .metric .val .after{color:#7ee0a3;}
+  .metric .val .arrow{color:var(--muted);font-size:16px;margin:0 6px;}
+  .metric.score{border-color:#5c4d12;background:#1c1810;}
+  .metric.score .val{color:var(--gold);}
+
+  /* Legend */
+  .legend{display:flex;gap:14px;align-items:center;margin:26px 0 6px;flex-wrap:wrap;}
+  .leg{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--muted);
+       background:var(--wall);border:1px solid var(--line);padding:7px 12px;border-radius:8px;}
+  .chip{width:15px;height:15px;border-radius:3px;flex:none;}
+  .c-action{background:#5ec07e;} .c-decision{background:#5b9bd5;}
+  .c-pain{background:#e76d6d;} .c-gold{background:#f0c33c;} .c-trigger{background:#e4dcc4;}
+  .c-cost{background:#b78ee6;}
+
+  /* Stage band */
+  .stage{margin-top:40px;}
+  .stage > h2{font-size:13px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+       color:var(--muted);margin:0 0 4px;}
+  .stage > .hint{font-size:13px;color:#65656e;margin:0 0 16px;font-style:italic;}
+
+  .board{display:flex;flex-wrap:wrap;gap:14px;}
+
+  .sticky{
+    width:158px;min-height:150px;padding:15px 14px;border-radius:3px;
+    color:var(--ink);font-weight:600;font-size:14px;line-height:1.32;
+    box-shadow:0 7px 18px rgba(0,0,0,.45);
+    display:flex;flex-direction:column;
+    transition:transform .14s ease, box-shadow .14s ease;
+    position:relative;
+  }
+  .sticky .kind{font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;
+       opacity:.45;margin-bottom:9px;}
+  .sticky .note{margin-top:auto;padding-top:8px;font-size:11px;font-weight:700;opacity:.55;}
+  .sticky:hover{transform:rotate(0deg) translateY(-5px)!important;box-shadow:0 14px 28px rgba(0,0,0,.55);z-index:5;}
+  .board .sticky:nth-child(4n+1){transform:rotate(-1.6deg);}
+  .board .sticky:nth-child(4n+2){transform:rotate(1.2deg);}
+  .board .sticky:nth-child(4n+3){transform:rotate(-.7deg);}
+  .board .sticky:nth-child(4n+4){transform:rotate(1.8deg);}
+
+  .s-action{background:#5ec07e;}
+  .s-decision{background:#5b9bd5;}
+  .s-pain{background:#e76d6d;}
+  .s-gold{background:#f0c33c;}
+  .s-trigger{background:#e4dcc4;}
+  .s-cost{background:#b78ee6;}
+
+  /* Loops */
+  .loops{margin-top:54px;border-top:1px solid var(--line);padding-top:34px;}
+  .loops h2{font-size:22px;margin:0 0 6px;}
+  .loops > p{color:var(--muted);margin:0 0 22px;max-width:720px;}
+  .loop-row{display:flex;flex-wrap:wrap;gap:18px;}
+  .loop{background:var(--wall);border:1px solid var(--line);border-radius:12px;
+        padding:18px 20px;flex:1;min-width:240px;}
+  .loop .nodes{font-size:17px;font-weight:600;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .loop .arr{color:#e0584f;font-size:20px;}
+  .loop .why{color:var(--muted);font-size:13.5px;margin-top:10px;}
+
+  /* Gold takeover */
+  .takeover{margin-top:54px;border-top:1px solid var(--line);padding-top:34px;}
+  .takeover h2{font-size:22px;margin:0 0 6px;}
+  .takeover > p{color:var(--muted);margin:0 0 22px;max-width:740px;}
+
+  /* The ailb flow — the collapsed A-Z */
+  .ailb-flow{margin-top:54px;border-top:1px solid var(--line);padding-top:34px;}
+  .ailb-flow h2{font-size:22px;margin:0 0 6px;}
+  .ailb-flow h2 .brand{color:var(--gold);}
+  .ailb-flow > p{color:var(--muted);margin:0 0 22px;max-width:740px;}
+  .flow-steps{display:flex;flex-wrap:wrap;gap:0;align-items:stretch;}
+  .flow-step{background:#10180f;border:1px solid #2a4a28;border-radius:12px;
+    padding:16px 18px;width:215px;position:relative;}
+  .flow-step .n{font-size:11px;font-weight:800;color:#7ee0a3;letter-spacing:.1em;margin-bottom:7px;}
+  .flow-step .t{font-weight:700;font-size:15px;}
+  .flow-step .d{color:var(--muted);font-size:13px;margin-top:6px;}
+  .flow-arrow{align-self:center;color:#7ee0a3;font-size:22px;padding:0 10px;}
+
+  /* Verdict */
+  .verdict{margin-top:54px;border:1px solid #5c4d12;background:#1c1810;border-radius:14px;padding:24px 26px;}
+  .verdict h2{margin:0 0 8px;font-size:20px;color:var(--gold);}
+  .verdict .scores{display:flex;gap:20px;flex-wrap:wrap;margin:14px 0;}
+  .verdict .sc{font-size:13.5px;color:var(--muted);}
+  .verdict .sc b{color:var(--text);font-size:17px;display:block;}
+  .verdict p{margin:8px 0 0;color:var(--text);font-size:15px;max-width:820px;}
+
+  @media(max-width:520px){ .sticky{width:calc(50% - 7px);} .flow-step{width:100%;} .flow-arrow{display:none;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="crumb"><a href="index.html">← all 15 maps</a></p>
+  <span class="pillar-tag pillar-products">PRODUCT MARKETPLACE</span>
+
+  <header class="intro">
+    <h1>Selling my used car in Lebanon — reality map</h1>
+    <p>Not a process diagram — a wall of what the seller actually experiences, A to Z. One sticky = one thought, decision, action, problem, or cost. Color reveals where ailb deletes, simplifies, or takes over.</p>
+    <div class="persona"><b>Karim, 34, Beirut</b> — leaving for a job in the Gulf in two months and needs to turn his 2014 Kia Cerato into fresh USD before he flies.</div>
+  </header>
+
+  <!-- METRICS: today vs with ailb -->
+  <div class="metrics">
+    <div class="metric"><div class="label">Steps</div><div class="val">22<span class="arrow">→</span><span class="after">5</span></div></div>
+    <div class="metric"><div class="label">Time</div><div class="val">4–6 wks<span class="arrow">→</span><span class="after">~1 wk</span></div></div>
+    <div class="metric"><div class="label">Physical visits</div><div class="val">6<span class="arrow">→</span><span class="after">2</span></div></div>
+    <div class="metric"><div class="label">Pain points</div><div class="val">14<span class="arrow">→</span><span class="after">2</span></div></div>
+    <div class="metric score"><div class="label">Disruption score</div><div class="val">6.8 / 10</div></div>
+  </div>
+
+  <div class="legend">
+    <div class="leg"><span class="chip c-trigger"></span>Trigger / thought</div>
+    <div class="leg"><span class="chip c-action"></span>Action — a thing I do</div>
+    <div class="leg"><span class="chip c-decision"></span>Decision — a choice I make</div>
+    <div class="leg"><span class="chip c-pain"></span>Pain point / fear</div>
+    <div class="leg"><span class="chip c-cost"></span>Cost / fee / waiting</div>
+    <div class="leg"><span class="chip c-gold"></span>ailb takeover opportunity</div>
+  </div>
+
+  <!-- STAGE 1: TRIGGER -->
+  <div class="stage">
+    <h2>Trigger</h2>
+    <p class="hint">The car has to go — the clock is already ticking.</p>
+    <div class="board">
+      <div class="sticky s-trigger"><span class="kind">trigger</span>I need cash — fast</div>
+      <div class="sticky s-trigger"><span class="kind">trigger</span>I'm upgrading — two cars, one parking spot</div>
+      <div class="sticky s-trigger"><span class="kind">trigger</span>I'm leaving for the Gulf — it can't just sit there</div>
+      <div class="sticky s-decision"><span class="kind">decision</span>Sell now, or wait for "the market to improve"?</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>Nobody can tell me what it's actually worth</div>
+    </div>
+  </div>
+
+  <!-- STAGE 2: PRICING BLIND -->
+  <div class="stage">
+    <h2>Pricing blind</h2>
+    <p class="hint">There is no Kelley Blue Book for Lebanon. Price = vibes plus four opinions.</p>
+    <div class="board">
+      <div class="sticky s-pain"><span class="kind">pain</span>No book value, no sold-price data — just asking prices</div>
+      <div class="sticky s-action"><span class="kind">action</span>Ask 4 friends what it's worth — get 4 different numbers<span class="note">~an evening</span></div>
+      <div class="sticky s-action"><span class="kind">action</span>Scan OLX + dubizzle for the "same" car<span class="note">~2 hrs</span></div>
+      <div class="sticky s-action"><span class="kind">action</span>Scroll the FB buy/sell groups for comps<span class="note">~1 hr</span></div>
+      <div class="sticky s-pain"><span class="kind">pain</span>Same car listed at $6,000 and $9,500</div>
+      <div class="sticky s-decision"><span class="kind">decision</span>Price high to leave room for the haggle?</div>
+      <div class="sticky s-gold"><span class="kind">ailb takeover</span>Price it from real asked-vs-sold market data</div>
+    </div>
+  </div>
+
+  <!-- STAGE 3: MAKING THE LISTING -->
+  <div class="stage">
+    <h2>Making the listing</h2>
+    <p class="hint">One car, five platforms, the same form five times.</p>
+    <div class="board">
+      <div class="sticky s-action"><span class="kind">action</span>Wash &amp; vacuum the car<span class="note">~1 hr or $10</span></div>
+      <div class="sticky s-action"><span class="kind">action</span>Take 15 photos before the light goes<span class="note">~30 min</span></div>
+      <div class="sticky s-action"><span class="kind">action</span>Write the description — "ankad, full option, super ndeef"</div>
+      <div class="sticky s-action"><span class="kind">action</span>Post on OLX</div>
+      <div class="sticky s-action"><span class="kind">action</span>Repost on dubizzle + 4 Facebook groups<span class="note">~1 hr</span></div>
+      <div class="sticky s-cost"><span class="kind">cost</span>OLX featured bump to stay visible<span class="note">~$10</span></div>
+      <div class="sticky s-pain"><span class="kind">pain</span>By tomorrow I'm buried on page 3</div>
+      <div class="sticky s-gold"><span class="kind">ailb takeover</span>One interview → a perfect listing, posted everywhere</div>
+    </div>
+  </div>
+
+  <!-- STAGE 4: FIELDING BUYERS -->
+  <div class="stage">
+    <h2>Fielding buyers</h2>
+    <p class="hint">The phone becomes a part-time job.</p>
+    <div class="board">
+      <div class="sticky s-pain"><span class="kind">pain</span>30 WhatsApp chats by day two</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>"Sho akher si3er?" before even a hello</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>Lowballers opening at half price</div>
+      <div class="sticky s-action"><span class="kind">action</span>Answer the same 10 questions, 30 times<span class="note">~daily</span></div>
+      <div class="sticky s-action"><span class="kind">action</span>Try to guess who's actually serious</div>
+      <div class="sticky s-decision"><span class="kind">decision</span>Who gets my number and a test drive?</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>Confirmed for 4pm. Nobody came.</div>
+      <div class="sticky s-cost"><span class="kind">cost</span>Two weeks of pings — mid-meeting, mid-dinner<span class="note">~2 wks</span></div>
+      <div class="sticky s-gold"><span class="kind">ailb takeover</span>Agent answers, filters &amp; qualifies — I only see real buyers</div>
+    </div>
+  </div>
+
+  <!-- STAGE 5: TEST DRIVES & HAGGLING -->
+  <div class="stage">
+    <h2>Test drives &amp; haggling</h2>
+    <p class="hint">Strangers, my car keys, and a price that keeps shrinking.</p>
+    <div class="board">
+      <div class="sticky s-action"><span class="kind">action</span>Meet in a public parking lot, ride along<span class="note">~1 hr each</span></div>
+      <div class="sticky s-pain"><span class="kind">pain</span>A stranger is driving my car. Am I safe?</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>His "mechanic friend" trashes the car to cut the price</div>
+      <div class="sticky s-action"><span class="kind">action</span>Haggle. Again. From scratch. With each one.</div>
+      <div class="sticky s-decision"><span class="kind">decision</span>Take $5,800 today, or hold out for $6,200?</div>
+      <div class="sticky s-cost"><span class="kind">cost</span>5 test drives, 3 no-shows<span class="note">2 weekends gone</span></div>
+      <div class="sticky s-gold"><span class="kind">ailb takeover</span>Verified buyers with a pre-agreed price range before anyone drives</div>
+    </div>
+  </div>
+
+  <!-- STAGE 6: THE TRANSFER -->
+  <div class="stage">
+    <h2>The transfer — mécanique &amp; daftar</h2>
+    <p class="hint">The deal is done; now the state gets involved.</p>
+    <div class="board">
+      <div class="sticky s-action"><span class="kind">action</span>Check for unpaid mécanique fees &amp; old tickets<span class="note">~half day</span></div>
+      <div class="sticky s-action"><span class="kind">action</span>Dig out the daftar, IDs, clearance papers</div>
+      <div class="sticky s-decision"><span class="kind">decision</span>Pay a moaamalat broker, or queue myself?</div>
+      <div class="sticky s-cost"><span class="kind">cost</span>Broker to "make it smooth"<span class="note">~$100–150</span></div>
+      <div class="sticky s-action"><span class="kind">action</span>Go to the vehicle registration center with the buyer<span class="note">~half day</span></div>
+      <div class="sticky s-pain"><span class="kind">pain</span>Queue chaos — "come back Thursday"</div>
+      <div class="sticky s-cost"><span class="kind">cost</span>Transfer fees, in cash<span class="note">~$200–400</span></div>
+      <div class="sticky s-pain"><span class="kind">pain</span>Buyer wants to pay after the paperwork. I want cash before.</div>
+      <div class="sticky s-gold"><span class="kind">ailb takeover</span>Agent preps the checklist, books the broker, sequences the payment</div>
+    </div>
+  </div>
+
+  <!-- STAGE 7: GETTING PAID -->
+  <div class="stage">
+    <h2>Getting paid</h2>
+    <p class="hint">No escrow, no transfer — a plastic bag of hundreds.</p>
+    <div class="board">
+      <div class="sticky s-pain"><span class="kind">pain</span>$6,000 in $100 bills — are they all real?</div>
+      <div class="sticky s-action"><span class="kind">action</span>Count it together at a bank counter<span class="note">~1 hr</span></div>
+      <div class="sticky s-pain"><span class="kind">pain</span>No escrow. The whole deal is a handshake.</div>
+      <div class="sticky s-gold"><span class="kind">ailb takeover</span>Safe-handover protocol — money &amp; papers in one sitting</div>
+      <div class="sticky s-trigger"><span class="kind">thought</span>Sold. Six weeks of my life.</div>
+    </div>
+  </div>
+
+  <!-- LOOPS -->
+  <div class="loops">
+    <h2>It's not linear — it loops</h2>
+    <p>Draw the arrows and the "process" collapses into a few tight feedback loops. These are where sellers get stuck, re-decide, and abandon.</p>
+    <div class="loop-row">
+      <div class="loop">
+        <div class="nodes">Price <span class="arr">↔</span> Silence <span class="arr">↔</span> Lowballers</div>
+        <div class="why">No bites, so I drop the price — and the lowballers re-anchor even lower. With no real market data, every drop feels like panic, not strategy.</div>
+      </div>
+      <div class="loop">
+        <div class="nodes">Listing <span class="arr">↔</span> Buried <span class="arr">↔</span> Repost</div>
+        <div class="why">Every platform buries you in 48 hours. Sellers bump, repost, and pay for features in a cycle that resets weekly — until they give up or dump the price.</div>
+      </div>
+      <div class="loop">
+        <div class="nodes">"Serious buyer" <span class="arr">↔</span> No-show <span class="arr">↔</span> Re-screen</div>
+        <div class="why">Each no-show burns an afternoon and erodes trust, so I screen harder — and scare away real buyers. Many sellers quit here and sell cheap to a dealer.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAKEOVER -->
+  <div class="takeover">
+    <h2>Where ailb takes over (gold)</h2>
+    <p>The strongest opportunities aren't the photos or the handshake — they're the weeks of pricing blind, answering "akher si3er?", and chasing no-shows.</p>
+    <div class="board">
+      <div class="sticky s-gold"><span class="kind">gold</span>Price the car from real comps, not vibes</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Write the listing &amp; post it everywhere at once</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Answer every "sho akher si3er?" — instantly, politely</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Filter the lowballers and the tourists</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Schedule verified buyers into one test-drive day</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Pre-negotiate a price range before anyone meets</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Prep the daftar/mécanique checklist &amp; book the moaamalat broker</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Run a safe cash-handover protocol</div>
+    </div>
+  </div>
+
+  <!-- THE AILB FLOW -->
+  <div class="ailb-flow">
+    <h2>The <span class="brand">ailb</span> flow — same outcome, 5 steps</h2>
+    <p>What survives after delete → simplify → automate. The human only takes photos, rides along, signs, and takes the cash. The agent does everything else.</p>
+    <div class="flow-steps">
+      <div class="flow-step"><div class="n">STEP 1</div><div class="t">Tell the agent once</div><div class="d">You: send 10 photos and answer a 12-question chat interview. Agent: builds the listing.</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">STEP 2</div><div class="t">Price &amp; publish</div><div class="d">Agent prices from comps and posts to OLX, dubizzle &amp; FB groups, keeps it bumped.</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">STEP 3</div><div class="t">Field every buyer</div><div class="d">Agent answers all chats 24/7, filters lowballers, verifies identity, pre-agrees a range. You: nothing.</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">STEP 4</div><div class="t">One test-drive day</div><div class="d">You: show up and ride along. Agent: books qualified buyers back-to-back in a public spot.</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">STEP 5</div><div class="t">Transfer &amp; cash</div><div class="d">Agent preps papers and books the broker slot. You: sign at the registration center and count the cash.</div></div>
+    </div>
+  </div>
+
+  <!-- VERDICT -->
+  <div class="verdict">
+    <h2>Verdict — should ailb disrupt this?</h2>
+    <div class="scores">
+      <div class="sc"><b>8/10</b>Pain density</div>
+      <div class="sc"><b>7/10</b>AI collapse ratio</div>
+      <div class="sc"><b>6/10</b>Frequency × market</div>
+      <div class="sc"><b>6/10</b>Demo feasibility by Saturday</div>
+    </div>
+    <p>The wall is dripping red: pricing blind, stranger danger, counterfeit fear, and a state-run transfer at the end. The agent can collapse the marketplace half beautifully — but the mécanique/daftar transfer is a physical, government-bound step we can checklist, not delete, and people sell a car only every few years. <b>Recommendation: roadmap.</b> Build the seller side after the buy-side demo proves the car marketplace; demo only the listing-and-fielding slice if time allows.</p>
+  </div>
+
+</div>
+</body>
+</html>

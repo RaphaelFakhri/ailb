@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ailb — 15 process maps, one decision</title>
+<style>
+  :root{
+    --bg:#0d0d10; --wall:#141419; --text:#e8e8ea; --muted:#8a8a92;
+    --line:#26262d; --gold:#f0c33c;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.45;}
+  .wrap{max-width:1180px;margin:0 auto;padding:40px 22px 90px;}
+
+  header.intro h1{font-size:32px;margin:0 0 10px;font-weight:700;letter-spacing:-.01em;}
+  header.intro h1 .brand{color:var(--gold);}
+  header.intro p{margin:0;color:var(--muted);font-size:16px;max-width:820px;}
+
+  .pillar-tag{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+    padding:4px 9px;border-radius:6px;border:1px solid;}
+  .pillar-products{color:#6db5ff;border-color:#27405e;background:#101a26;}
+  .pillar-services{color:#7ee0a3;border-color:#1f4a30;background:#0f1f16;}
+  .pillar-gov{color:#f0a35c;border-color:#5e3f1d;background:#221708;}
+
+  .rec{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+    padding:4px 9px;border-radius:6px;}
+  .rec-demo{color:#0d0d10;background:var(--gold);}
+  .rec-roadmap{color:#9fb6d8;background:#1a2433;border:1px solid #2c3c54;}
+  .rec-skip{color:#b88;background:#241214;border:1px solid #4a2326;}
+
+  /* Demo picks */
+  .picks{margin-top:36px;border:1px solid #5c4d12;background:#1c1810;border-radius:16px;padding:26px 28px;}
+  .picks h2{margin:0 0 6px;font-size:21px;color:var(--gold);}
+  .picks > p{margin:0 0 18px;color:var(--muted);font-size:14.5px;max-width:840px;}
+  .pick-row{display:flex;gap:16px;flex-wrap:wrap;}
+  .pick{flex:1;min-width:250px;background:#14110a;border:1px solid #3d3410;border-radius:12px;padding:18px 20px;text-decoration:none;color:var(--text);transition:transform .12s ease;}
+  .pick:hover{transform:translateY(-3px);border-color:var(--gold);}
+  .pick .ttl{font-weight:700;font-size:16.5px;margin:10px 0 6px;}
+  .pick .why{color:var(--muted);font-size:13.5px;}
+  .pick .score{color:var(--gold);font-weight:800;font-size:13px;margin-top:10px;}
+
+  /* Ranking table */
+  .rank{margin-top:54px;}
+  .rank h2{font-size:22px;margin:0 0 6px;}
+  .rank > p{color:var(--muted);margin:0 0 20px;max-width:780px;font-size:14.5px;}
+  table{width:100%;border-collapse:collapse;font-size:14px;}
+  th{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;
+    text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);}
+  th.num,td.num{text-align:center;}
+  td{padding:12px;border-bottom:1px solid var(--line);vertical-align:middle;}
+  tr.row:hover{background:#15151b;}
+  td .t a{color:var(--text);font-weight:700;text-decoration:none;font-size:15px;}
+  td .t a:hover{color:var(--gold);}
+  td .ins{color:var(--muted);font-size:12.5px;margin-top:4px;max-width:480px;}
+  .ov{font-weight:800;font-size:17px;color:var(--gold);}
+  .sub{color:var(--muted);font-size:12px;}
+  .collapse{color:#7ee0a3;font-weight:700;white-space:nowrap;}
+  .collapse .from{color:var(--muted);font-weight:600;}
+
+  /* Strategy */
+  .strategy{margin-top:54px;border-top:1px solid var(--line);padding-top:34px;}
+  .strategy h2{font-size:22px;margin:0 0 6px;}
+  .strategy > p{color:var(--muted);margin:0 0 20px;max-width:820px;}
+  .strat-row{display:flex;gap:18px;flex-wrap:wrap;}
+  .strat{background:var(--wall);border:1px solid var(--line);border-radius:12px;padding:18px 20px;flex:1;min-width:260px;}
+  .strat .h{font-weight:700;font-size:15.5px;margin-bottom:8px;}
+  .strat .h .em{color:var(--gold);}
+  .strat p{color:var(--muted);font-size:13.5px;margin:0;}
+
+  @media(max-width:760px){
+    .hide-m{display:none;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="intro">
+    <h1><span class="brand">ailb</span> — 15 reality maps, one decision</h1>
+    <p>Every map is the same exercise: sticky-note the process A→Z as a real Lebanese person lives it, then delete → simplify → automate. Scores are comparable across maps (same 4-part rubric). Goal: pick what we demo Saturday 8AM — and what we only talk about.</p>
+  </header>
+
+  <!-- DEMO PICKS -->
+  <div class="picks">
+    <h2>🏆 Recommended demo trio — one per pillar</h2>
+    <p>Each pillar's highest score that is also demoable by Saturday with zero external integration. Together they tell one story: <b>the agent interviews you once, then does the work</b> — sells your stuff, builds your livelihood, fights your bureaucracy.</p>
+    <div class="pick-row">
+      <a class="pick" href="sell-used-stuff.html">
+        <span class="pillar-tag pillar-products">Products</span>
+        <div class="ttl">Sell my used stuff</div>
+        <div class="why">"Send a photo, get cash." Agent prices it, writes the listing, answers all 30 buyers, qualifies the serious one, schedules the handover. The full agent loop, demoable in chat today.</div>
+        <div class="score">8.0 / 10 · highest collapse ratio (16 → 3 steps)</div>
+      </a>
+      <a class="pick" href="become-provider.html">
+        <span class="pillar-tag pillar-services">Services</span>
+        <div class="ttl">Become a provider</div>
+        <div class="why">The onboarding interview IS the product: ten voice-note answers become a live business profile. Needs zero existing supply — and every interview creates the supply for everything else.</div>
+        <div class="score">8.0 / 10 · demo feasibility 10/10</div>
+      </a>
+      <a class="pick" href="schengen-visa.html">
+        <span class="pillar-tag pillar-gov">Government</span>
+        <div class="ttl">Schengen visa prep</div>
+        <div class="why">~80% of the suffering is requirements, document prep, and slot-hunting — pure concierge work, no government integration needed. Highest emotional stakes of all 15 maps.</div>
+        <div class="score">7.8 / 10 · pain density 9/10</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- RANKING -->
+  <div class="rank">
+    <h2>All 15, ranked</h2>
+    <p>Rubric: <b>Pain</b> = how red the map is · <b>Collapse</b> = share of steps deleted/automated · <b>Market</b> = frequency × value in Lebanon · <b>Demo</b> = feasible by Saturday without integrations. Overall = mean.</p>
+    <table>
+      <thead><tr>
+        <th>#</th><th>Process</th><th class="hide-m">Pillar</th>
+        <th class="num">Steps</th><th class="num hide-m">Pain</th><th class="num hide-m">Collapse</th>
+        <th class="num hide-m">Market</th><th class="num hide-m">Demo</th>
+        <th class="num">Overall</th><th>Call</th>
+      </tr></thead>
+      <tbody>
+        <tr class="row"><td>1</td><td><div class="t"><a href="sell-used-stuff.html">Selling my used stuff</a></div><div class="ins">No single pain is severe — it's death by thirty WhatsApp chats; the agent can do everything between the photo and the handover.</div></td><td class="hide-m"><span class="pillar-tag pillar-products">Products</span></td><td class="num collapse"><span class="from">16 →</span> 3</td><td class="num hide-m">6</td><td class="num hide-m">9</td><td class="num hide-m">8</td><td class="num hide-m">9</td><td class="num"><span class="ov">8.0</span></td><td><span class="rec rec-demo">Demo</span></td></tr>
+        <tr class="row"><td>2</td><td><div class="t"><a href="become-provider.html">Becoming a service provider</a></div><div class="ins">The onboarding interview IS the product — and every provider interviewed becomes the supply for the other maps.</div></td><td class="hide-m"><span class="pillar-tag pillar-services">Services</span></td><td class="num collapse"><span class="from">16 →</span> 3</td><td class="num hide-m">7</td><td class="num hide-m">8</td><td class="num hide-m">7</td><td class="num hide-m">10</td><td class="num"><span class="ov">8.0</span></td><td><span class="rec rec-demo">Demo</span></td></tr>
+        <tr class="row"><td>3</td><td><div class="t"><a href="schengen-visa.html">Schengen visa (Lebanese passport)</a></div><div class="ins">The embassy decision can't be collapsed, but ~80% of the suffering is prep and slot-hunting — exactly what a chat concierge demos brilliantly.</div></td><td class="hide-m"><span class="pillar-tag pillar-gov">Government</span></td><td class="num collapse"><span class="from">21 →</span> 5</td><td class="num hide-m">9</td><td class="num hide-m">6</td><td class="num hide-m">7</td><td class="num hide-m">9</td><td class="num"><span class="ov">7.8</span></td><td><span class="rec rec-demo">Demo</span></td></tr>
+        <tr class="row"><td>4</td><td><div class="t"><a href="hire-home-repair.html">Hiring home repair</a></div><div class="ins">Everything between "it broke" and "it's fixed" is search, phone tag, and price anxiety — none of it is the repair.</div></td><td class="hide-m"><span class="pillar-tag pillar-services">Services</span></td><td class="num collapse"><span class="from">19 →</span> 5</td><td class="num hide-m">9</td><td class="num hide-m">7</td><td class="num hide-m">8</td><td class="num hide-m">7</td><td class="num"><span class="ov">7.8</span></td><td><span class="rec rec-demo">Demo</span></td></tr>
+        <tr class="row"><td>5</td><td><div class="t"><a href="buy-used-car.html">Buying a used car</a></div><div class="ins">The buyer's real job is surviving a hostile information market — "qualify me once, then hunt and verify for me" deletes the grind.</div></td><td class="hide-m"><span class="pillar-tag pillar-products">Products</span></td><td class="num collapse"><span class="from">24 →</span> 5</td><td class="num hide-m">7</td><td class="num hide-m">8</td><td class="num hide-m">7</td><td class="num hide-m">8</td><td class="num"><span class="ov">7.5</span></td><td><span class="rec rec-demo">Demo</span></td></tr>
+        <tr class="row"><td>6</td><td><div class="t"><a href="buy-used-phone.html">Buying a used iPhone</a></div><div class="ins">The product isn't search, it's trust — the verification layer Lebanon's used-phone market never had.</div></td><td class="hide-m"><span class="pillar-tag pillar-products">Products</span></td><td class="num collapse"><span class="from">18 →</span> 4</td><td class="num hide-m">7</td><td class="num hide-m">7</td><td class="num hide-m">8</td><td class="num hide-m">8</td><td class="num"><span class="ov">7.5</span></td><td><span class="rec rec-demo">Demo</span></td></tr>
+        <tr class="row"><td>7</td><td><div class="t"><a href="ikhraj-qaid.html">Ikhraj qaid (civil extract)</a></div><div class="ins">The atomic dependency of all Lebanese paperwork — requirements are oral tradition and the 3-month validity clock kills every bigger file.</div></td><td class="hide-m"><span class="pillar-tag pillar-gov">Government</span></td><td class="num collapse"><span class="from">14 →</span> 3</td><td class="num hide-m">7</td><td class="num hide-m">5</td><td class="num hide-m">9</td><td class="num hide-m">8</td><td class="num"><span class="ov">7.3</span></td><td><span class="rec rec-demo">Demo</span></td></tr>
+        <tr class="row"><td>8</td><td><div class="t"><a href="sell-used-car.html">Selling my used car</a></div><div class="ins">No book value, no escrow: six weeks of pricing by vibes, lowballers, and trusting strangers with your keys and your cash.</div></td><td class="hide-m"><span class="pillar-tag pillar-products">Products</span></td><td class="num collapse"><span class="from">22 →</span> 5</td><td class="num hide-m">8</td><td class="num hide-m">7</td><td class="num hide-m">6</td><td class="num hide-m">6</td><td class="num"><span class="ov">6.8</span></td><td><span class="rec rec-roadmap">Roadmap</span></td></tr>
+        <tr class="row"><td>9</td><td><div class="t"><a href="rent-apartment.html">Renting an apartment (Beirut)</a></div><div class="ins">Listed rent is fiction — the real product is the true monthly cost (rent + moteur + water + fees) interrogated out of every landlord.</div></td><td class="hide-m"><span class="pillar-tag pillar-products">Products</span></td><td class="num collapse"><span class="from">22 →</span> 6</td><td class="num hide-m">7</td><td class="num hide-m">6</td><td class="num hide-m">6</td><td class="num hide-m">7</td><td class="num"><span class="ov">6.5</span></td><td><span class="rec rec-roadmap">Roadmap</span></td></tr>
+        <tr class="row"><td>10</td><td><div class="t"><a href="home-beauty.html">At-home beauty booking</a></div><div class="ins">Price opacity → inbox congestion → slot decay; fixing it requires owning real calendars that can't be faked by Saturday.</div></td><td class="hide-m"><span class="pillar-tag pillar-services">Services</span></td><td class="num collapse"><span class="from">16 →</span> 3</td><td class="num hide-m">7</td><td class="num hide-m">8</td><td class="num hide-m">6</td><td class="num hide-m">5</td><td class="num"><span class="ov">6.5</span></td><td><span class="rec rec-roadmap">Roadmap</span></td></tr>
+        <tr class="row"><td>11</td><td><div class="t"><a href="passport-renewal.html">Passport renewal (General Security)</a></div><div class="ins">The state is mid-digitization — ailb's edge is surviving platform volatility; biometrics and production time cap the collapse hard.</div></td><td class="hide-m"><span class="pillar-tag pillar-gov">Government</span></td><td class="num collapse"><span class="from">17 →</span> 4</td><td class="num hide-m">7</td><td class="num hide-m">4</td><td class="num hide-m">8</td><td class="num hide-m">7</td><td class="num"><span class="ov">6.5</span></td><td><span class="rec rec-roadmap">Roadmap</span></td></tr>
+        <tr class="row"><td>12</td><td><div class="t"><a href="hire-tutor.html">Finding a private tutor</a></div><div class="ins">Parents pay $300/month behind a closed door with zero progress data — the real product is the progress loop, which is slow to make credible.</div></td><td class="hide-m"><span class="pillar-tag pillar-services">Services</span></td><td class="num collapse"><span class="from">18 →</span> 3</td><td class="num hide-m">6</td><td class="num hide-m">6</td><td class="num hide-m">7</td><td class="num hide-m">6</td><td class="num"><span class="ov">6.3</span></td><td><span class="rec rec-roadmap">Roadmap</span></td></tr>
+        <tr class="row"><td>13</td><td><div class="t"><a href="criminal-record.html">Sajel 3adli (criminal record)</a></div><div class="ins">Already half-disrupted — LibanPost/OMT quietly solved access and nobody knows it; a concierge can nearly fully absorb the errand.</div></td><td class="hide-m"><span class="pillar-tag pillar-gov">Government</span></td><td class="num collapse"><span class="from">14 →</span> 3</td><td class="num hide-m">5</td><td class="num hide-m">7</td><td class="num hide-m">7</td><td class="num hide-m">6</td><td class="num"><span class="ov">6.3</span></td><td><span class="rec rec-roadmap">Roadmap</span></td></tr>
+        <tr class="row"><td>14</td><td><div class="t"><a href="car-transfer.html">Car ownership transfer (mécanique)</a></div><div class="ins">The pain is stubbornly physical — what collapses is the coordination layer between two strangers: a novel two-party chat, a harder solo demo.</div></td><td class="hide-m"><span class="pillar-tag pillar-gov">Government</span></td><td class="num collapse"><span class="from">20 →</span> 6</td><td class="num hide-m">8</td><td class="num hide-m">4</td><td class="num hide-m">6</td><td class="num hide-m">6</td><td class="num"><span class="ov">6.0</span></td><td><span class="rec rec-roadmap">Roadmap</span></td></tr>
+        <tr class="row"><td>15</td><td><div class="t"><a href="hire-mover.html">Moving apartments (déménagement)</a></div><div class="ins">The market punishes whoever believes a number — but the job stays stubbornly physical and people move once every few years.</div></td><td class="hide-m"><span class="pillar-tag pillar-services">Services</span></td><td class="num collapse"><span class="from">16 →</span> 4</td><td class="num hide-m">8</td><td class="num hide-m">5</td><td class="num hide-m">4</td><td class="num hide-m">6</td><td class="num"><span class="ov">5.8</span></td><td><span class="rec rec-skip">Skip</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- STRATEGY -->
+  <div class="strategy">
+    <h2>What the wall tells us</h2>
+    <p>Patterns that emerge when you read all 15 maps side by side — use these lines in the pitch.</p>
+    <div class="strat-row">
+      <div class="strat">
+        <div class="h">The common enemy is <span class="em">trust, not search</span></div>
+        <p>Across all 15 maps the red stickies are the same species: no prices, no reviews, no escrow, no recourse, strangers and cash. Lebanon doesn't lack marketplaces — it lacks a trust layer. ailb's agent is that layer: it qualifies, verifies, and vouches.</p>
+      </div>
+      <div class="strat">
+        <div class="h">The interview <span class="em">replaces the platform</span></div>
+        <p>Every winning flow starts the same way: the agent asks you about yourself once — what you're selling, what you can do, where you want to go — and the listing, profile, or document file falls out of the conversation. No forms anywhere.</p>
+      </div>
+      <div class="strat">
+        <div class="h">The moonshot story: <span class="em">car A→Z</span></div>
+        <p>Map #8 (sell car) + #5 (buy car) + #14 (transfer) chain into one narrative: ailb sells your car, finds the buyer their car, and walks both through the mécanique with a prepared file and one visit. Pitch it as the vision; demo the trio above as the proof.</p>
+      </div>
+      <div class="strat">
+        <div class="h">Government = <span class="em">concierge, not integration</span></div>
+        <p>No API will save you at the mukhtar. The honest gov play is knowing the live requirements, prefilling the file, watching validity clocks (ikhraj qaid &lt; 3 months!), sequencing dependencies, and making every mandatory visit a single prepared one.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

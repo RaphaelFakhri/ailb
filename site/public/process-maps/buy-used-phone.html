@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buying a used iPhone — ailb reality map</title>
+<style>
+  :root{
+    --bg:#0d0d10;
+    --wall:#141419;
+    --text:#e8e8ea;
+    --muted:#8a8a92;
+    --line:#26262d;
+    --ink:#181410;
+    --gold:#f0c33c;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.45;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:40px 22px 90px;}
+
+  .crumb{font-size:13px;margin:0 0 18px;}
+  .crumb a{color:var(--muted);text-decoration:none;}
+  .crumb a:hover{color:var(--gold);}
+  .pillar-tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+    padding:5px 10px;border-radius:6px;margin-bottom:14px;border:1px solid;}
+  .pillar-products{color:#6db5ff;border-color:#27405e;background:#101a26;}
+  .pillar-services{color:#7ee0a3;border-color:#1f4a30;background:#0f1f16;}
+  .pillar-gov{color:#f0a35c;border-color:#5e3f1d;background:#221708;}
+
+  header.intro h1{font-size:30px;margin:0 0 10px;font-weight:700;letter-spacing:-.01em;}
+  header.intro p{margin:0;color:var(--muted);font-size:16px;max-width:760px;}
+  .persona{margin-top:14px;font-size:14.5px;color:var(--text);background:var(--wall);
+    border:1px solid var(--line);border-radius:10px;padding:12px 16px;max-width:760px;}
+  .persona b{color:var(--gold);}
+
+  /* Metrics bar */
+  .metrics{display:flex;gap:12px;flex-wrap:wrap;margin:26px 0 4px;}
+  .metric{background:var(--wall);border:1px solid var(--line);border-radius:10px;
+    padding:12px 18px;min-width:140px;}
+  .metric .label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;}
+  .metric .val{font-size:22px;font-weight:700;margin-top:3px;}
+  .metric .val .after{color:#7ee0a3;}
+  .metric .val .arrow{color:var(--muted);font-size:16px;margin:0 6px;}
+  .metric.score{border-color:#5c4d12;background:#1c1810;}
+  .metric.score .val{color:var(--gold);}
+
+  /* Legend */
+  .legend{display:flex;gap:14px;align-items:center;margin:26px 0 6px;flex-wrap:wrap;}
+  .leg{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--muted);
+       background:var(--wall);border:1px solid var(--line);padding:7px 12px;border-radius:8px;}
+  .chip{width:15px;height:15px;border-radius:3px;flex:none;}
+  .c-action{background:#5ec07e;} .c-decision{background:#5b9bd5;}
+  .c-pain{background:#e76d6d;} .c-gold{background:#f0c33c;} .c-trigger{background:#e4dcc4;}
+  .c-cost{background:#b78ee6;}
+
+  /* Stage band */
+  .stage{margin-top:40px;}
+  .stage > h2{font-size:13px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+       color:var(--muted);margin:0 0 4px;}
+  .stage > .hint{font-size:13px;color:#65656e;margin:0 0 16px;font-style:italic;}
+
+  .board{display:flex;flex-wrap:wrap;gap:14px;}
+
+  .sticky{
+    width:158px;min-height:150px;padding:15px 14px;border-radius:3px;
+    color:var(--ink);font-weight:600;font-size:14px;line-height:1.32;
+    box-shadow:0 7px 18px rgba(0,0,0,.45);
+    display:flex;flex-direction:column;
+    transition:transform .14s ease, box-shadow .14s ease;
+    position:relative;
+  }
+  .sticky .kind{font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;
+       opacity:.45;margin-bottom:9px;}
+  .sticky .note{margin-top:auto;padding-top:8px;font-size:11px;font-weight:700;opacity:.55;}
+  .sticky:hover{transform:rotate(0deg) translateY(-5px)!important;box-shadow:0 14px 28px rgba(0,0,0,.55);z-index:5;}
+  .board .sticky:nth-child(4n+1){transform:rotate(-1.6deg);}
+  .board .sticky:nth-child(4n+2){transform:rotate(1.2deg);}
+  .board .sticky:nth-child(4n+3){transform:rotate(-.7deg);}
+  .board .sticky:nth-child(4n+4){transform:rotate(1.8deg);}
+
+  .s-action{background:#5ec07e;}
+  .s-decision{background:#5b9bd5;}
+  .s-pain{background:#e76d6d;}
+  .s-gold{background:#f0c33c;}
+  .s-trigger{background:#e4dcc4;}
+  .s-cost{background:#b78ee6;}
+
+  /* Loops */
+  .loops{margin-top:54px;border-top:1px solid var(--line);padding-top:34px;}
+  .loops h2{font-size:22px;margin:0 0 6px;}
+  .loops > p{color:var(--muted);margin:0 0 22px;max-width:720px;}
+  .loop-row{display:flex;flex-wrap:wrap;gap:18px;}
+  .loop{background:var(--wall);border:1px solid var(--line);border-radius:12px;
+        padding:18px 20px;flex:1;min-width:240px;}
+  .loop .nodes{font-size:17px;font-weight:600;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .loop .arr{color:#e0584f;font-size:20px;}
+  .loop .why{color:var(--muted);font-size:13.5px;margin-top:10px;}
+
+  /* Gold takeover */
+  .takeover{margin-top:54px;border-top:1px solid var(--line);padding-top:34px;}
+  .takeover h2{font-size:22px;margin:0 0 6px;}
+  .takeover > p{color:var(--muted);margin:0 0 22px;max-width:740px;}
+
+  /* The ailb flow — the collapsed A-Z */
+  .ailb-flow{margin-top:54px;border-top:1px solid var(--line);padding-top:34px;}
+  .ailb-flow h2{font-size:22px;margin:0 0 6px;}
+  .ailb-flow h2 .brand{color:var(--gold);}
+  .ailb-flow > p{color:var(--muted);margin:0 0 22px;max-width:740px;}
+  .flow-steps{display:flex;flex-wrap:wrap;gap:0;align-items:stretch;}
+  .flow-step{background:#10180f;border:1px solid #2a4a28;border-radius:12px;
+    padding:16px 18px;width:215px;position:relative;}
+  .flow-step .n{font-size:11px;font-weight:800;color:#7ee0a3;letter-spacing:.1em;margin-bottom:7px;}
+  .flow-step .t{font-weight:700;font-size:15px;}
+  .flow-step .d{color:var(--muted);font-size:13px;margin-top:6px;}
+  .flow-arrow{align-self:center;color:#7ee0a3;font-size:22px;padding:0 10px;}
+
+  /* Verdict */
+  .verdict{margin-top:54px;border:1px solid #5c4d12;background:#1c1810;border-radius:14px;padding:24px 26px;}
+  .verdict h2{margin:0 0 8px;font-size:20px;color:var(--gold);}
+  .verdict .scores{display:flex;gap:20px;flex-wrap:wrap;margin:14px 0;}
+  .verdict .sc{font-size:13.5px;color:var(--muted);}
+  .verdict .sc b{color:var(--text);font-size:17px;display:block;}
+  .verdict p{margin:8px 0 0;color:var(--text);font-size:15px;max-width:820px;}
+
+  @media(max-width:520px){ .sticky{width:calc(50% - 7px);} .flow-step{width:100%;} .flow-arrow{display:none;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="crumb"><a href="index.html">← all 15 maps</a></p>
+  <span class="pillar-tag pillar-products">PRODUCT MARKETPLACE</span>
+
+  <header class="intro">
+    <h1>Buying a used iPhone in Lebanon — reality map</h1>
+    <p>Not a process diagram — a wall of what the buyer actually experiences, A to Z. One sticky = one thought, decision, action, problem, or cost. Color reveals where ailb deletes, simplifies, or takes over.</p>
+    <div class="persona"><b>Jad, 22, student in Tripoli</b> — saved $350 for a used iPhone and has heard exactly enough iCloud-lock horror stories to trust absolutely nobody.</div>
+  </header>
+
+  <!-- METRICS: today vs with ailb -->
+  <div class="metrics">
+    <div class="metric"><div class="label">Steps</div><div class="val">18<span class="arrow">→</span><span class="after">4</span></div></div>
+    <div class="metric"><div class="label">Time</div><div class="val">1–2 wks<span class="arrow">→</span><span class="after">2–3 days</span></div></div>
+    <div class="metric"><div class="label">Meetups</div><div class="val">3<span class="arrow">→</span><span class="after">1</span></div></div>
+    <div class="metric"><div class="label">Pain points</div><div class="val">12<span class="arrow">→</span><span class="after">2</span></div></div>
+    <div class="metric score"><div class="label">Disruption score</div><div class="val">7.5 / 10</div></div>
+  </div>
+
+  <div class="legend">
+    <div class="leg"><span class="chip c-trigger"></span>Trigger / thought</div>
+    <div class="leg"><span class="chip c-action"></span>Action — a thing I do</div>
+    <div class="leg"><span class="chip c-decision"></span>Decision — a choice I make</div>
+    <div class="leg"><span class="chip c-pain"></span>Pain point / fear</div>
+    <div class="leg"><span class="chip c-cost"></span>Cost / fee / waiting</div>
+    <div class="leg"><span class="chip c-gold"></span>ailb takeover opportunity</div>
+  </div>
+
+  <!-- STAGE 1: QUALIFYING -->
+  <div class="stage">
+    <h2>Qualifying myself</h2>
+    <p class="hint">Before the scams: which phone do I even need?</p>
+    <div class="board">
+      <div class="sticky s-trigger"><span class="kind">trigger</span>Screen shattered — this phone is done</div>
+      <div class="sticky s-trigger"><span class="kind">trigger</span>My battery dies by noon</div>
+      <div class="sticky s-decision"><span class="kind">decision</span>$350 — iPhone 11 Pro, 12, or 13 mini?</div>
+      <div class="sticky s-decision"><span class="kind">decision</span>Used original, or "new" clone from the souk?</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>Prices for the "same" phone vary by $150</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>I don't actually know what specs I need</div>
+      <div class="sticky s-gold"><span class="kind">ailb takeover</span>Budget + usage → exact model &amp; fair price, in one chat</div>
+    </div>
+  </div>
+
+  <!-- STAGE 2: THE HUNT -->
+  <div class="stage">
+    <h2>The hunt</h2>
+    <p class="hint">Every great deal is a red flag. Every fair deal might still be one.</p>
+    <div class="board">
+      <div class="sticky s-action"><span class="kind">action</span>Scroll OLX phone listings nightly<span class="note">~1 hr/night</span></div>
+      <div class="sticky s-action"><span class="kind">action</span>Join 3 "iPhone Lebanon" FB groups</div>
+      <div class="sticky s-action"><span class="kind">action</span>Ask the phone shop in the souk</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>"Original 100%" — half are refurbs</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>Too cheap = probably stolen</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>Stock photos instead of the actual device</div>
+      <div class="sticky s-cost"><span class="kind">cost</span>Days of scrolling, dozens of tabs<span class="note">~4–5 days</span></div>
+      <div class="sticky s-gold"><span class="kind">ailb takeover</span>Agent hunts, dedupes, flags scam-pattern listings</div>
+    </div>
+  </div>
+
+  <!-- STAGE 3: VETTING SELLERS -->
+  <div class="stage">
+    <h2>Vetting sellers</h2>
+    <p class="hint">An interrogation I have to invent myself, ten times over.</p>
+    <div class="board">
+      <div class="sticky s-action"><span class="kind">action</span>WhatsApp 10 sellers<span class="note">~2 days</span></div>
+      <div class="sticky s-action"><span class="kind">action</span>Ask for a battery-health screenshot</div>
+      <div class="sticky s-action"><span class="kind">action</span>Ask for box, receipt, IMEI</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>"Battery 100%" on a 3-year-old phone. Sure.</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>iCloud-locked horror stories in every group</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>Seller refuses a video call — why?</div>
+      <div class="sticky s-decision"><span class="kind">decision</span>Which 2 are worth actually meeting?</div>
+      <div class="sticky s-gold"><span class="kind">ailb takeover</span>Agent runs the interrogation checklist on every seller</div>
+    </div>
+  </div>
+
+  <!-- STAGE 4: THE MEETUP TEST -->
+  <div class="stage">
+    <h2>The meetup test</h2>
+    <p class="hint">Twenty minutes, a stranger watching, and a checklist I half-remember.</p>
+    <div class="board">
+      <div class="sticky s-action"><span class="kind">action</span>Meet somewhere public<span class="note">~trip + 1 hr</span></div>
+      <div class="sticky s-action"><span class="kind">action</span>Check the IMEI matches the box</div>
+      <div class="sticky s-action"><span class="kind">action</span>Settings → battery health — the real number</div>
+      <div class="sticky s-action"><span class="kind">action</span>Test FaceID, cameras, speakers, charging port</div>
+      <div class="sticky s-action"><span class="kind">action</span>Watch them sign out of iCloud in front of me</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>I can't tell an original screen from a refurb one</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>He's waiting. Pressure to decide right now.</div>
+      <div class="sticky s-decision"><span class="kind">decision</span>Buy it, or walk away awkwardly?</div>
+      <div class="sticky s-cost"><span class="kind">cost</span>Each meetup = half a day + transport<span class="note">~$5–10 + half day</span></div>
+      <div class="sticky s-gold"><span class="kind">ailb takeover</span>Live checklist in chat guiding me, step by step</div>
+    </div>
+  </div>
+
+  <!-- STAGE 5: PAYING & AFTER -->
+  <div class="stage">
+    <h2>Paying &amp; after</h2>
+    <p class="hint">Cash changes hands and every protection evaporates.</p>
+    <div class="board">
+      <div class="sticky s-action"><span class="kind">action</span>"Sho akher si3er?" — haggle</div>
+      <div class="sticky s-action"><span class="kind">action</span>Pay cash USD, count it twice</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>No warranty. No receipt. No recourse.</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>If it dies next week, that's my problem</div>
+      <div class="sticky s-decision"><span class="kind">decision</span>Pay $20 more at a shop for a "warranty"?</div>
+      <div class="sticky s-cost"><span class="kind">cost</span>Stolen-phone risk: total loss, no comeback<span class="note">up to $350</span></div>
+      <div class="sticky s-gold"><span class="kind">ailb takeover</span>Verified-device badge + 7-day agent-mediated recourse</div>
+    </div>
+  </div>
+
+  <!-- LOOPS -->
+  <div class="loops">
+    <h2>It's not linear — it loops</h2>
+    <p>Draw the arrows and the "process" collapses into a few tight feedback loops. These are where buyers get stuck, re-decide, and abandon — or buy scared and overpay at a shop.</p>
+    <div class="loop-row">
+      <div class="loop">
+        <div class="nodes">Good price <span class="arr">↔</span> Scam fear</div>
+        <div class="why">The better the deal, the less I trust it. With no verification layer, price stops carrying information — so buyers distrust the whole market equally.</div>
+      </div>
+      <div class="loop">
+        <div class="nodes">Vetting questions <span class="arr">↔</span> Seller ghosts</div>
+        <div class="why">Ask for IMEI and a video call and half the sellers vanish — including honest ones who just can't be bothered. Back to the hunt.</div>
+      </div>
+      <div class="loop">
+        <div class="nodes">Checklist <span class="arr">↔</span> Meetup pressure</div>
+        <div class="why">Everyone knows what to check at home; almost nobody checks it all with the seller standing there. The knowledge exists — it fails at the exact moment it matters.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAKEOVER -->
+  <div class="takeover">
+    <h2>Where ailb takes over (gold)</h2>
+    <p>The product here isn't search — it's trust. The agent becomes the verification layer the Lebanese used-phone market has never had.</p>
+    <div class="board">
+      <div class="sticky s-gold"><span class="kind">gold</span>Map budget + usage → the right model</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Hunt all platforms, dedupe, flag scams</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Interrogate sellers: IMEI, battery proof, video call</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Fair-price verdict by model &amp; condition</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Live meetup checklist — step by step in chat</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Log IMEI + photos as a receipt of record</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>7-day agent-mediated recourse window</div>
+    </div>
+  </div>
+
+  <!-- THE AILB FLOW -->
+  <div class="ailb-flow">
+    <h2>The <span class="brand">ailb</span> flow — same outcome, 4 steps</h2>
+    <p>What survives after delete → simplify → automate. The human goes to one meetup and pays. The agent does the knowing.</p>
+    <div class="flow-steps">
+      <div class="flow-step"><div class="n">STEP 1</div><div class="t">Tell the agent</div><div class="d">You: budget + how you use a phone, one chat. Agent: picks the model and the fair price band.</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">STEP 2</div><div class="t">Agent shortlists verified sellers</div><div class="d">Agent hunts, flags scams, interrogates sellers for IMEI + battery proof. You: nothing.</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">STEP 3</div><div class="t">One guided meetup</div><div class="d">You: meet the best seller. Agent: walks you through the test live in chat — IMEI, battery, FaceID, iCloud sign-out.</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">STEP 4</div><div class="t">Pay with a record</div><div class="d">You: hand over the cash. Agent: logs IMEI + photos as your receipt and opens a 7-day recourse window.</div></div>
+    </div>
+  </div>
+
+  <!-- VERDICT -->
+  <div class="verdict">
+    <h2>Verdict — should ailb disrupt this?</h2>
+    <div class="scores">
+      <div class="sc"><b>7/10</b>Pain density</div>
+      <div class="sc"><b>7/10</b>AI collapse ratio</div>
+      <div class="sc"><b>8/10</b>Frequency × market</div>
+      <div class="sc"><b>8/10</b>Demo feasibility by Saturday</div>
+    </div>
+    <p>Phones are the highest-frequency, highest-anxiety purchase on this wall, and the pain is concentrated in one word: trust. The agent can't physically inspect the device — that caps the collapse ratio — but "qualify → verified shortlist → live meetup checklist" needs zero integrations and demos beautifully in chat. <b>Recommendation: hackathon demo flow.</b> Pair it with sell-used-stuff as the two sides of the same trusted marketplace.</p>
+  </div>
+
+</div>
+</body>
+</html>

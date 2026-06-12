@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Getting an ikhraj qaid — ailb reality map</title>
+<style>
+  :root{
+    --bg:#0d0d10;
+    --wall:#141419;
+    --text:#e8e8ea;
+    --muted:#8a8a92;
+    --line:#26262d;
+    --ink:#181410;
+    --gold:#f0c33c;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.45;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:40px 22px 90px;}
+
+  .crumb{font-size:13px;margin:0 0 18px;}
+  .crumb a{color:var(--muted);text-decoration:none;}
+  .crumb a:hover{color:var(--gold);}
+  .pillar-tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+    padding:5px 10px;border-radius:6px;margin-bottom:14px;border:1px solid;}
+  .pillar-products{color:#6db5ff;border-color:#27405e;background:#101a26;}
+  .pillar-services{color:#7ee0a3;border-color:#1f4a30;background:#0f1f16;}
+  .pillar-gov{color:#f0a35c;border-color:#5e3f1d;background:#221708;}
+
+  header.intro h1{font-size:30px;margin:0 0 10px;font-weight:700;letter-spacing:-.01em;}
+  header.intro p{margin:0;color:var(--muted);font-size:16px;max-width:760px;}
+  .persona{margin-top:14px;font-size:14.5px;color:var(--text);background:var(--wall);
+    border:1px solid var(--line);border-radius:10px;padding:12px 16px;max-width:760px;}
+  .persona b{color:var(--gold);}
+
+  /* Metrics bar */
+  .metrics{display:flex;gap:12px;flex-wrap:wrap;margin:26px 0 4px;}
+  .metric{background:var(--wall);border:1px solid var(--line);border-radius:10px;
+    padding:12px 18px;min-width:140px;}
+  .metric .label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;}
+  .metric .val{font-size:22px;font-weight:700;margin-top:3px;}
+  .metric .val .after{color:#7ee0a3;}
+  .metric .val .arrow{color:var(--muted);font-size:16px;margin:0 6px;}
+  .metric.score{border-color:#5c4d12;background:#1c1810;}
+  .metric.score .val{color:var(--gold);}
+
+  /* Legend */
+  .legend{display:flex;gap:14px;align-items:center;margin:26px 0 6px;flex-wrap:wrap;}
+  .leg{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--muted);
+       background:var(--wall);border:1px solid var(--line);padding:7px 12px;border-radius:8px;}
+  .chip{width:15px;height:15px;border-radius:3px;flex:none;}
+  .c-action{background:#5ec07e;} .c-decision{background:#5b9bd5;}
+  .c-pain{background:#e76d6d;} .c-gold{background:#f0c33c;} .c-trigger{background:#e4dcc4;}
+  .c-cost{background:#b78ee6;}
+
+  /* Stage band */
+  .stage{margin-top:40px;}
+  .stage > h2{font-size:13px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+       color:var(--muted);margin:0 0 4px;}
+  .stage > .hint{font-size:13px;color:#65656e;margin:0 0 16px;font-style:italic;}
+
+  .board{display:flex;flex-wrap:wrap;gap:14px;}
+
+  .sticky{
+    width:158px;min-height:150px;padding:15px 14px;border-radius:3px;
+    color:var(--ink);font-weight:600;font-size:14px;line-height:1.32;
+    box-shadow:0 7px 18px rgba(0,0,0,.45);
+    display:flex;flex-direction:column;
+    transition:transform .14s ease, box-shadow .14s ease;
+    position:relative;
+  }
+  .sticky .kind{font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;
+       opacity:.45;margin-bottom:9px;}
+  .sticky .note{margin-top:auto;padding-top:8px;font-size:11px;font-weight:700;opacity:.55;}
+  .sticky:hover{transform:rotate(0deg) translateY(-5px)!important;box-shadow:0 14px 28px rgba(0,0,0,.55);z-index:5;}
+  .board .sticky:nth-child(4n+1){transform:rotate(-1.6deg);}
+  .board .sticky:nth-child(4n+2){transform:rotate(1.2deg);}
+  .board .sticky:nth-child(4n+3){transform:rotate(-.7deg);}
+  .board .sticky:nth-child(4n+4){transform:rotate(1.8deg);}
+
+  .s-action{background:#5ec07e;}
+  .s-decision{background:#5b9bd5;}
+  .s-pain{background:#e76d6d;}
+  .s-gold{background:#f0c33c;}
+  .s-trigger{background:#e4dcc4;}
+  .s-cost{background:#b78ee6;}
+
+  /* Loops */
+  .loops{margin-top:54px;border-top:1px solid var(--line);padding-top:34px;}
+  .loops h2{font-size:22px;margin:0 0 6px;}
+  .loops > p{color:var(--muted);margin:0 0 22px;max-width:720px;}
+  .loop-row{display:flex;flex-wrap:wrap;gap:18px;}
+  .loop{background:var(--wall);border:1px solid var(--line);border-radius:12px;
+        padding:18px 20px;flex:1;min-width:240px;}
+  .loop .nodes{font-size:17px;font-weight:600;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .loop .arr{color:#e0584f;font-size:20px;}
+  .loop .why{color:var(--muted);font-size:13.5px;margin-top:10px;}
+
+  /* Gold takeover */
+  .takeover{margin-top:54px;border-top:1px solid var(--line);padding-top:34px;}
+  .takeover h2{font-size:22px;margin:0 0 6px;}
+  .takeover > p{color:var(--muted);margin:0 0 22px;max-width:740px;}
+
+  /* The ailb flow — the collapsed A-Z */
+  .ailb-flow{margin-top:54px;border-top:1px solid var(--line);padding-top:34px;}
+  .ailb-flow h2{font-size:22px;margin:0 0 6px;}
+  .ailb-flow h2 .brand{color:var(--gold);}
+  .ailb-flow > p{color:var(--muted);margin:0 0 22px;max-width:740px;}
+  .flow-steps{display:flex;flex-wrap:wrap;gap:0;align-items:stretch;}
+  .flow-step{background:#10180f;border:1px solid #2a4a28;border-radius:12px;
+    padding:16px 18px;width:215px;position:relative;}
+  .flow-step .n{font-size:11px;font-weight:800;color:#7ee0a3;letter-spacing:.1em;margin-bottom:7px;}
+  .flow-step .t{font-weight:700;font-size:15px;}
+  .flow-step .d{color:var(--muted);font-size:13px;margin-top:6px;}
+  .flow-arrow{align-self:center;color:#7ee0a3;font-size:22px;padding:0 10px;}
+
+  /* Verdict */
+  .verdict{margin-top:54px;border:1px solid #5c4d12;background:#1c1810;border-radius:14px;padding:24px 26px;}
+  .verdict h2{margin:0 0 8px;font-size:20px;color:var(--gold);}
+  .verdict .scores{display:flex;gap:20px;flex-wrap:wrap;margin:14px 0;}
+  .verdict .sc{font-size:13.5px;color:var(--muted);}
+  .verdict .sc b{color:var(--text);font-size:17px;display:block;}
+  .verdict p{margin:8px 0 0;color:var(--text);font-size:15px;max-width:820px;}
+
+  @media(max-width:520px){ .sticky{width:calc(50% - 7px);} .flow-step{width:100%;} .flow-arrow{display:none;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="crumb"><a href="index.html">← all 15 maps</a></p>
+  <span class="pillar-tag pillar-gov">GOVERNMENT SERVICES</span>
+
+  <header class="intro">
+    <h1>Getting an ikhraj qaid (إخراج قيد) — reality map</h1>
+    <p>Not a process diagram — a wall of what the person actually experiences, A to Z. One sticky = one thought, decision, action, problem, or cost. Color reveals where ailb deletes, simplifies, or takes over.</p>
+    <div class="persona"><b>Maya, 27, Achrafieh</b> — needs a fresh ikhraj qaid fardi for a job contract. It's her third one this year, and her civil registry is still in Batroun.</div>
+  </header>
+
+  <!-- METRICS: today vs with ailb -->
+  <div class="metrics">
+    <div class="metric"><div class="label">Steps</div><div class="val">14<span class="arrow">→</span><span class="after">3</span></div></div>
+    <div class="metric"><div class="label">Time</div><div class="val">~2 days<span class="arrow">→</span><span class="after">~2 hrs</span></div></div>
+    <div class="metric"><div class="label">Physical visits</div><div class="val">3<span class="arrow">→</span><span class="after">1</span></div></div>
+    <div class="metric"><div class="label">Pain points</div><div class="val">12<span class="arrow">→</span><span class="after">1</span></div></div>
+    <div class="metric score"><div class="label">Disruption score</div><div class="val">7.3 / 10</div></div>
+  </div>
+
+  <div class="legend">
+    <div class="leg"><span class="chip c-trigger"></span>Trigger / thought</div>
+    <div class="leg"><span class="chip c-action"></span>Action — a thing I do</div>
+    <div class="leg"><span class="chip c-decision"></span>Decision — a choice I make</div>
+    <div class="leg"><span class="chip c-pain"></span>Pain point / fear</div>
+    <div class="leg"><span class="chip c-cost"></span>Cost / fee / waiting</div>
+    <div class="leg"><span class="chip c-gold"></span>ailb takeover opportunity</div>
+  </div>
+
+  <!-- STAGE 1 -->
+  <div class="stage">
+    <h2>Trigger</h2>
+    <p class="hint">Nobody wakes up wanting one. Some institution demands it — again.</p>
+    <div class="board">
+      <div class="sticky s-trigger"><span class="kind">trigger</span>The bank says: bring an ikhraj qaid</div>
+      <div class="sticky s-trigger"><span class="kind">trigger</span>"Issued less than 3 months ago" — mine is from January</div>
+      <div class="sticky s-trigger"><span class="kind">trigger</span>The passport renewal needs one too. So does the visa file.</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>I got one 4 months ago. It's the same data since 1932.</div>
+      <div class="sticky s-gold"><span class="kind">ailb takeover</span>I tell ailb the transaction — it tells me which paper, which version, how fresh</div>
+    </div>
+  </div>
+
+  <!-- STAGE 2 -->
+  <div class="stage">
+    <h2>Which one do I even need?</h2>
+    <p class="hint">The requirements are oral tradition. Two officials, three answers.</p>
+    <div class="board">
+      <div class="sticky s-decision"><span class="kind">decision</span>Fardi (individual) or 3a2ili (family)?</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>The bank clerk said fardi. The notary later said "no, 3a2ili."</div>
+      <div class="sticky s-decision"><span class="kind">decision</span>Mukhtar version, or the Nufus (personal status dept.) version?</div>
+      <div class="sticky s-trigger"><span class="kind">trigger</span>A friend says some requests went digital via LibanPost. For my case? Who knows.</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>Nobody — including officials — gives the same answer twice</div>
+      <div class="sticky s-decision"><span class="kind">decision</span>Arabic only, or will I need a sworn translation later?</div>
+      <div class="sticky s-gold"><span class="kind">ailb takeover</span>ailb knows the current requirement per institution — bank vs embassy vs notary</div>
+    </div>
+  </div>
+
+  <!-- STAGE 3 -->
+  <div class="stage">
+    <h2>Finding my mukhtar</h2>
+    <p class="hint">An elected man with a stamp, no website, and hours known only to the neighborhood.</p>
+    <div class="board">
+      <div class="sticky s-action"><span class="kind">action</span>Figure out where my qaid actually is — my family's village, not where I live</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>I've lived in Achrafieh 10 years. My registry is still Batroun.</div>
+      <div class="sticky s-decision"><span class="kind">decision</span>Drive to Batroun, or find a mukhtar nearby who'll issue it?</div>
+      <div class="sticky s-action"><span class="kind">action</span>Ask the family WhatsApp group who the mukhtar is now</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>No website, no listed hours. He works from a desk in a barber shop.</div>
+      <div class="sticky s-action"><span class="kind">action</span>Call him. No answer. Call again at 6pm.<span class="note">~2 days of phone tag</span></div>
+      <div class="sticky s-cost"><span class="kind">cost</span>Half a day off work just to catch him in<span class="note">~4h lost wages</span></div>
+      <div class="sticky s-gold"><span class="kind">ailb takeover</span>ailb keeps a live directory: which mukhtar, where, when, what he charges</div>
+    </div>
+  </div>
+
+  <!-- STAGE 4 -->
+  <div class="stage">
+    <h2>The visit</h2>
+    <p class="hint">Cash, copies, stamps — and the eternal "rja3 bukra."</p>
+    <div class="board">
+      <div class="sticky s-action"><span class="kind">action</span>Bring my ID. Or the old ikhraj qaid. Or both — to be safe.</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>He asks for my sejel number. I have no idea what that is.</div>
+      <div class="sticky s-action"><span class="kind">action</span>Photocopy my ID at the shop next door<span class="note">~LBP 20,000</span></div>
+      <div class="sticky s-cost"><span class="kind">cost</span>The fee is whatever he says today<span class="note">~LBP 200–500k, varies by mukhtar</span></div>
+      <div class="sticky s-pain"><span class="kind">pain</span>Cash only. Exact change preferred.</div>
+      <div class="sticky s-action"><span class="kind">action</span>He fills the form by hand, signs, stamps<span class="note">~15 min if he's in</span></div>
+      <div class="sticky s-pain"><span class="kind">pain</span>"Rja3 bukra" — out of forms today</div>
+      <div class="sticky s-action"><span class="kind">action</span>Buy tawabe3 (fiscal stamps) from the kiosk<span class="note">~LBP 100,000</span></div>
+      <div class="sticky s-gold"><span class="kind">ailb takeover</span>ailb pre-confirms by phone: he's in, has forms, fee agreed, I'm expected</div>
+    </div>
+  </div>
+
+  <!-- STAGE 5 -->
+  <div class="stage">
+    <h2>When the mukhtar isn't enough — the Nufus</h2>
+    <p class="hint">Some institutions only accept the Personal Status Department extract. Different building, same century.</p>
+    <div class="board">
+      <div class="sticky s-trigger"><span class="kind">trigger</span>The embassy wants it from the Nufus, not the mukhtar</div>
+      <div class="sticky s-action"><span class="kind">action</span>Go to the Personal Status office for my district</div>
+      <div class="sticky s-cost"><span class="kind">cost</span>Queue from 8am, window closes around noon<span class="note">~3h standing</span></div>
+      <div class="sticky s-pain"><span class="kind">pain</span>Wrong window. Wrong floor. Once, wrong building.</div>
+      <div class="sticky s-action"><span class="kind">action</span>More tawabe3, more photocopies<span class="note">~LBP 150,000</span></div>
+      <div class="sticky s-pain"><span class="kind">pain</span>The employee's lunch break is load-bearing</div>
+      <div class="sticky s-gold"><span class="kind">ailb takeover</span>ailb knows WHICH source each institution accepts — mukhtar print vs Nufus extract</div>
+    </div>
+  </div>
+
+  <!-- STAGE 6 -->
+  <div class="stage">
+    <h2>Use it, lose it, repeat</h2>
+    <p class="hint">The paper "expires" by policy, not by law — and the treadmill restarts.</p>
+    <div class="board">
+      <div class="sticky s-action"><span class="kind">action</span>Photocopy it before handing it over — they keep the original</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>It "expires" in 3 months. My birthplace doesn't.</div>
+      <div class="sticky s-trigger"><span class="kind">trigger</span>Two months later: another institution, another fresh one</div>
+      <div class="sticky s-cost"><span class="kind">cost</span>3–4 ikhraj qaids a year, each a half-day<span class="note">~LBP 1.5M/yr + days lost</span></div>
+      <div class="sticky s-pain"><span class="kind">pain</span>It expired while I was collecting the OTHER documents</div>
+      <div class="sticky s-gold"><span class="kind">ailb takeover</span>ailb tracks every copy's issue date: "renew before your TLS appointment"</div>
+    </div>
+  </div>
+
+  <!-- LOOPS -->
+  <div class="loops">
+    <h2>It's not linear — it loops</h2>
+    <p>Draw the arrows and the "process" collapses into a few tight feedback loops. These are where people get stuck, re-decide, and abandon.</p>
+    <div class="loop-row">
+      <div class="loop">
+        <div class="nodes">Fresh copy <span class="arr">↔</span> Other documents <span class="arr">↔</span> 3-month expiry</div>
+        <div class="why">Every bigger file (visa, passport, job) takes longer than 3 months to assemble — so the ikhraj qaid expires mid-file and you start over. The most common loop in Lebanese paperwork.</div>
+      </div>
+      <div class="loop">
+        <div class="nodes">Which version? <span class="arr">↔</span> Which institution?</div>
+        <div class="why">Fardi vs 3a2ili vs Nufus extract — each office names a different one, often after you've already paid for the wrong one.</div>
+      </div>
+      <div class="loop">
+        <div class="nodes">Mukhtar's hours <span class="arr">↔</span> My work hours</div>
+        <div class="why">He works when I work. Catching him is days of phone tag or a half-day gamble — multiplied by every fresh copy.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAKEOVER -->
+  <div class="takeover">
+    <h2>Where ailb takes over (gold)</h2>
+    <p>ailb can't integrate with the registry — and doesn't need to. The product is knowing, preparing, timing, and dispatching. The paper itself was never the hard part.</p>
+    <div class="board">
+      <div class="sticky s-gold"><span class="kind">gold</span>Answer "which version do I need?" per institution, correctly, today</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Live mukhtar directory: location, hours, fee — crowd-verified</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Pre-confirm the visit by phone so it never fails</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Exact bring-list: ID, copies, tawabe3, cash amount</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Validity tracker across every document I hold</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Sequence the big file so nothing expires mid-way</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Dispatch a vetted mu3a2eb to Batroun when I can't go</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>One mukhtar trip covers the next 3 known transactions</div>
+    </div>
+  </div>
+
+  <!-- THE AILB FLOW -->
+  <div class="ailb-flow">
+    <h2>The <span class="brand">ailb</span> flow — same outcome, 4 steps</h2>
+    <p>What survives after delete → simplify → automate. The human only does what only the human can do.</p>
+    <div class="flow-steps">
+      <div class="flow-step"><div class="n">STEP 1</div><div class="t">Say what you're doing</div><div class="d">"Renewing my passport." The agent resolves the exact version, source, and freshness required.</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">STEP 2</div><div class="t">Agent stages the visit</div><div class="d">Finds your mukhtar (or the Nufus), confirms hours, fee, and forms by phone. Sends the bring-list.</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">STEP 3</div><div class="t">One prepared visit</div><div class="d">You — or a dispatched mu3a2eb — go once, with exact cash, copies, and tawabe3. No second trip.</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">STEP 4</div><div class="t">Agent tracks the window</div><div class="d">Issue date filed. Every dependent transaction gets scheduled inside the 3-month validity.</div></div>
+    </div>
+  </div>
+
+  <!-- VERDICT -->
+  <div class="verdict">
+    <h2>Verdict — should ailb disrupt this?</h2>
+    <div class="scores">
+      <div class="sc"><b>7/10</b>Pain density</div>
+      <div class="sc"><b>5/10</b>AI collapse ratio</div>
+      <div class="sc"><b>9/10</b>Frequency × market</div>
+      <div class="sc"><b>8/10</b>Demo feasibility by Saturday</div>
+    </div>
+    <p>Overall: <b>7.3/10</b>. The insight: the ikhraj qaid is the atomic dependency of nearly every other Lebanese transaction, and its real cost isn't the fee — it's that requirements are oral tradition and validity windows silently kill bigger files. ailb wins not by touching the registry but by being the only actor in Lebanon that reliably knows what to bring, when, and to whom — and by tracking the 3-month clock across everything. The chat demo (transaction → version → mukhtar → bring-list → expiry tracking) is fast and instantly recognizable to any Lebanese judge: <b>hackathon demo flow</b>.</p>
+  </div>
+
+</div>
+</body>
+</html>

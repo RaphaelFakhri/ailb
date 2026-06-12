@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Moving apartments — ailb reality map</title>
+<style>
+  :root{
+    --bg:#0d0d10;
+    --wall:#141419;
+    --text:#e8e8ea;
+    --muted:#8a8a92;
+    --line:#26262d;
+    --ink:#181410;
+    --gold:#f0c33c;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.45;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:40px 22px 90px;}
+
+  .crumb{font-size:13px;margin:0 0 18px;}
+  .crumb a{color:var(--muted);text-decoration:none;}
+  .crumb a:hover{color:var(--gold);}
+  .pillar-tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+    padding:5px 10px;border-radius:6px;margin-bottom:14px;border:1px solid;}
+  .pillar-products{color:#6db5ff;border-color:#27405e;background:#101a26;}
+  .pillar-services{color:#7ee0a3;border-color:#1f4a30;background:#0f1f16;}
+  .pillar-gov{color:#f0a35c;border-color:#5e3f1d;background:#221708;}
+
+  header.intro h1{font-size:30px;margin:0 0 10px;font-weight:700;letter-spacing:-.01em;}
+  header.intro p{margin:0;color:var(--muted);font-size:16px;max-width:760px;}
+  .persona{margin-top:14px;font-size:14.5px;color:var(--text);background:var(--wall);
+    border:1px solid var(--line);border-radius:10px;padding:12px 16px;max-width:760px;}
+  .persona b{color:var(--gold);}
+
+  /* Metrics bar */
+  .metrics{display:flex;gap:12px;flex-wrap:wrap;margin:26px 0 4px;}
+  .metric{background:var(--wall);border:1px solid var(--line);border-radius:10px;
+    padding:12px 18px;min-width:140px;}
+  .metric .label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;}
+  .metric .val{font-size:22px;font-weight:700;margin-top:3px;}
+  .metric .val .after{color:#7ee0a3;}
+  .metric .val .arrow{color:var(--muted);font-size:16px;margin:0 6px;}
+  .metric.score{border-color:#5c4d12;background:#1c1810;}
+  .metric.score .val{color:var(--gold);}
+
+  /* Legend */
+  .legend{display:flex;gap:14px;align-items:center;margin:26px 0 6px;flex-wrap:wrap;}
+  .leg{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--muted);
+       background:var(--wall);border:1px solid var(--line);padding:7px 12px;border-radius:8px;}
+  .chip{width:15px;height:15px;border-radius:3px;flex:none;}
+  .c-action{background:#5ec07e;} .c-decision{background:#5b9bd5;}
+  .c-pain{background:#e76d6d;} .c-gold{background:#f0c33c;} .c-trigger{background:#e4dcc4;}
+  .c-cost{background:#b78ee6;}
+
+  /* Stage band */
+  .stage{margin-top:40px;}
+  .stage > h2{font-size:13px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+       color:var(--muted);margin:0 0 4px;}
+  .stage > .hint{font-size:13px;color:#65656e;margin:0 0 16px;font-style:italic;}
+
+  .board{display:flex;flex-wrap:wrap;gap:14px;}
+
+  .sticky{
+    width:158px;min-height:150px;padding:15px 14px;border-radius:3px;
+    color:var(--ink);font-weight:600;font-size:14px;line-height:1.32;
+    box-shadow:0 7px 18px rgba(0,0,0,.45);
+    display:flex;flex-direction:column;
+    transition:transform .14s ease, box-shadow .14s ease;
+    position:relative;
+  }
+  .sticky .kind{font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;
+       opacity:.45;margin-bottom:9px;}
+  .sticky .note{margin-top:auto;padding-top:8px;font-size:11px;font-weight:700;opacity:.55;}
+  .sticky:hover{transform:rotate(0deg) translateY(-5px)!important;box-shadow:0 14px 28px rgba(0,0,0,.55);z-index:5;}
+  .board .sticky:nth-child(4n+1){transform:rotate(-1.6deg);}
+  .board .sticky:nth-child(4n+2){transform:rotate(1.2deg);}
+  .board .sticky:nth-child(4n+3){transform:rotate(-.7deg);}
+  .board .sticky:nth-child(4n+4){transform:rotate(1.8deg);}
+
+  .s-action{background:#5ec07e;}
+  .s-decision{background:#5b9bd5;}
+  .s-pain{background:#e76d6d;}
+  .s-gold{background:#f0c33c;}
+  .s-trigger{background:#e4dcc4;}
+  .s-cost{background:#b78ee6;}
+
+  /* Loops */
+  .loops{margin-top:54px;border-top:1px solid var(--line);padding-top:34px;}
+  .loops h2{font-size:22px;margin:0 0 6px;}
+  .loops > p{color:var(--muted);margin:0 0 22px;max-width:720px;}
+  .loop-row{display:flex;flex-wrap:wrap;gap:18px;}
+  .loop{background:var(--wall);border:1px solid var(--line);border-radius:12px;
+        padding:18px 20px;flex:1;min-width:240px;}
+  .loop .nodes{font-size:17px;font-weight:600;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .loop .arr{color:#e0584f;font-size:20px;}
+  .loop .why{color:var(--muted);font-size:13.5px;margin-top:10px;}
+
+  /* Gold takeover */
+  .takeover{margin-top:54px;border-top:1px solid var(--line);padding-top:34px;}
+  .takeover h2{font-size:22px;margin:0 0 6px;}
+  .takeover > p{color:var(--muted);margin:0 0 22px;max-width:740px;}
+
+  /* The ailb flow — the collapsed A-Z */
+  .ailb-flow{margin-top:54px;border-top:1px solid var(--line);padding-top:34px;}
+  .ailb-flow h2{font-size:22px;margin:0 0 6px;}
+  .ailb-flow h2 .brand{color:var(--gold);}
+  .ailb-flow > p{color:var(--muted);margin:0 0 22px;max-width:740px;}
+  .flow-steps{display:flex;flex-wrap:wrap;gap:0;align-items:stretch;}
+  .flow-step{background:#10180f;border:1px solid #2a4a28;border-radius:12px;
+    padding:16px 18px;width:215px;position:relative;}
+  .flow-step .n{font-size:11px;font-weight:800;color:#7ee0a3;letter-spacing:.1em;margin-bottom:7px;}
+  .flow-step .t{font-weight:700;font-size:15px;}
+  .flow-step .d{color:var(--muted);font-size:13px;margin-top:6px;}
+  .flow-arrow{align-self:center;color:#7ee0a3;font-size:22px;padding:0 10px;}
+
+  /* Verdict */
+  .verdict{margin-top:54px;border:1px solid #5c4d12;background:#1c1810;border-radius:14px;padding:24px 26px;}
+  .verdict h2{margin:0 0 8px;font-size:20px;color:var(--gold);}
+  .verdict .scores{display:flex;gap:20px;flex-wrap:wrap;margin:14px 0;}
+  .verdict .sc{font-size:13.5px;color:var(--muted);}
+  .verdict .sc b{color:var(--text);font-size:17px;display:block;}
+  .verdict p{margin:8px 0 0;color:var(--text);font-size:15px;max-width:820px;}
+
+  @media(max-width:520px){ .sticky{width:calc(50% - 7px);} .flow-step{width:100%;} .flow-arrow{display:none;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="crumb"><a href="index.html">← all 15 maps</a></p>
+  <span class="pillar-tag pillar-services">SERVICE MARKETPLACE</span>
+
+  <header class="intro">
+    <h1>Moving apartments — reality map</h1>
+    <p>Not a process diagram — a wall of what a couple actually experiences during a déménagement in Lebanon, A to Z. One sticky = one thought, decision, action, problem, or cost. Color reveals where ailb deletes, simplifies, or takes over.</p>
+    <div class="persona"><b>Karim &amp; Lara, 33, Ain el Remmaneh → Antelias</b> — landlord wants $750 "fresh" starting next month; new place is on the 5th floor, the stairwell is narrow, and everything they own has to survive the trip.</div>
+  </header>
+
+  <!-- METRICS: today vs with ailb -->
+  <div class="metrics">
+    <div class="metric"><div class="label">Steps</div><div class="val">16<span class="arrow">→</span><span class="after">4</span></div></div>
+    <div class="metric"><div class="label">Time to a firm price</div><div class="val">~2.5 wks<span class="arrow">→</span><span class="after">~3 days</span></div></div>
+    <div class="metric"><div class="label">Quote visits hosted</div><div class="val">2<span class="arrow">→</span><span class="after">0</span></div></div>
+    <div class="metric"><div class="label">Pain points</div><div class="val">17<span class="arrow">→</span><span class="after">4</span></div></div>
+    <div class="metric score"><div class="label">Disruption score</div><div class="val">5.8 / 10</div></div>
+  </div>
+
+  <div class="legend">
+    <div class="leg"><span class="chip c-trigger"></span>Trigger / thought</div>
+    <div class="leg"><span class="chip c-action"></span>Action — a thing I do</div>
+    <div class="leg"><span class="chip c-decision"></span>Decision — a choice I make</div>
+    <div class="leg"><span class="chip c-pain"></span>Pain point / fear</div>
+    <div class="leg"><span class="chip c-cost"></span>Cost / fee / waiting</div>
+    <div class="leg"><span class="chip c-gold"></span>ailb takeover opportunity</div>
+  </div>
+
+  <div class="stage">
+    <h2>We're moving</h2>
+    <p class="hint">Nobody moves in Lebanon for fun. Something pushed.</p>
+    <div class="board">
+      <div class="sticky s-trigger"><span class="kind">trigger</span>Landlord wants $750 "fresh dollars" — we're out</div>
+      <div class="sticky s-trigger"><span class="kind">trigger</span>Found a place in Antelias. Must be out by end of month.</div>
+      <div class="sticky s-decision"><span class="kind">decision</span>Cousins + a pickup, or actual movers?</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>We own a fridge, a washing machine, and a 3-seater. Cousins won't cut it.</div>
+      <div class="sticky s-action"><span class="kind">action</span>Google "déménagement Lebanon" — a few FB pages, zero prices anywhere</div>
+    </div>
+  </div>
+
+  <div class="stage">
+    <h2>Finding movers</h2>
+    <p class="hint">An industry with trucks but no front door.</p>
+    <div class="board">
+      <div class="sticky s-action"><span class="kind">action</span>Ask the natour + building WhatsApp for "shirket naklieh"</div>
+      <div class="sticky s-action"><span class="kind">action</span>FB recommendations thread: 30 comments, 9 companies — 4 are the same guy</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>No prices, no reviews — just "super professional!!" from profiles with no photo</div>
+      <div class="sticky s-action"><span class="kind">action</span>Call 5 numbers. Two answer.<span class="note">3 days for 2 callbacks</span></div>
+      <div class="sticky s-decision"><span class="kind">decision</span>Company with a real truck, or Abu Ali w el shabéb with a pickup?</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>Every single quote requires a home visit first</div>
+      <div class="sticky s-cost"><span class="kind">cost</span>Three days gone just lining up the visits<span class="note">~3 days</span></div>
+      <div class="sticky s-gold"><span class="kind">ailb takeover</span>ailb surveys the apartment from a phone video — no visits</div>
+    </div>
+  </div>
+
+  <div class="stage">
+    <h2>The quote circus</h2>
+    <p class="hint">Three numbers that measure three different things.</p>
+    <div class="board">
+      <div class="sticky s-action"><span class="kind">action</span>Host mover visit #1 — he eyeballs the rooms<span class="note">half a day off work</span></div>
+      <div class="sticky s-pain"><span class="kind">pain</span>"$500… ya3ne, approximately." Nothing written down.</div>
+      <div class="sticky s-action"><span class="kind">action</span>Host visit #2<span class="note">another afternoon gone</span></div>
+      <div class="sticky s-pain"><span class="kind">pain</span>Quote #2 is $300. Why 40% less? What did he NOT count?</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>5th floor + narrow stairs = "lezem winch" — maybe +$100, maybe not</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>Quotes aren't comparable: one includes packing, one doesn't, one "men shouf"</div>
+      <div class="sticky s-decision"><span class="kind">decision</span>Cheap guy with vague answers, or pricey guy with a real truck?</div>
+      <div class="sticky s-cost"><span class="kind">cost</span>Two afternoons hosting strangers — still no firm price<span class="note">2 half-days</span></div>
+      <div class="sticky s-gold"><span class="kind">ailb takeover</span>ailb gets line-item quotes on the SAME written spec from all three</div>
+    </div>
+  </div>
+
+  <div class="stage">
+    <h2>The trust math</h2>
+    <p class="hint">Strangers will carry everything you own, and the contract is a voice note.</p>
+    <div class="board">
+      <div class="sticky s-pain"><span class="kind">pain</span>Strangers handling literally everything we own</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>If something breaks: "wallah it was already cracked." Insurance? Shou ya3ne insurance.</div>
+      <div class="sticky s-action"><span class="kind">action</span>Photograph every valuable item "just in case"<span class="note">~2h, our own DIY insurance</span></div>
+      <div class="sticky s-decision"><span class="kind">decision</span>Laptop, papers, jewelry — move those ourselves?</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>No contract exists. The "agreement" is a WhatsApp voice note.</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>If they no-show on moving day, I lose the apartment handover date</div>
+      <div class="sticky s-gold"><span class="kind">ailb takeover</span>ailb turns inventory + condition photos into the actual contract</div>
+    </div>
+  </div>
+
+  <div class="stage">
+    <h2>Moving day</h2>
+    <p class="hint">Nine hours of being the unpaid site supervisor of your own life.</p>
+    <div class="board">
+      <div class="sticky s-action"><span class="kind">action</span>They arrive 2 hours late, with a smaller truck than promised</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>"The sofa won't fit — second trip, $50 extra"</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>Three guys came instead of the promised five — I'm carrying boxes myself</div>
+      <div class="sticky s-action"><span class="kind">action</span>Run between two buildings directing traffic all day<span class="note">~9h on my feet</span></div>
+      <div class="sticky s-pain"><span class="kind">pain</span>The winch guy is a separate guy — a fresh negotiation on the sidewalk</div>
+      <div class="sticky s-cost"><span class="kind">cost</span>Extras bloom: stairs fee, "distance" fee, "el shabéb te3bo"<span class="note">+$80 surprise</span></div>
+      <div class="sticky s-decision"><span class="kind">decision</span>Argue each extra at 8pm with my mattress on the truck?</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>The fridge arrives with a new dent. Nobody saw anything.</div>
+      <div class="sticky s-gold"><span class="kind">ailb takeover</span>ailb supervises milestones: loaded → in transit → delivered → condition-checked</div>
+    </div>
+  </div>
+
+  <div class="stage">
+    <h2>Settling the bill</h2>
+    <p class="hint">Cash on the sidewalk, disputes into the void.</p>
+    <div class="board">
+      <div class="sticky s-action"><span class="kind">action</span>Pay cash USD on the sidewalk<span class="note">$430 + $80 extras</span></div>
+      <div class="sticky s-pain"><span class="kind">pain</span>The dent dispute goes nowhere. No recourse, no insurance, no referee.</div>
+      <div class="sticky s-action"><span class="kind">action</span>Unpack over two weeks, discovering breakage in slow motion</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>One box of kitchen stuff simply… never arrived</div>
+      <div class="sticky s-trigger"><span class="kind">trigger</span>The vow: "next time, we move ourselves"</div>
+      <div class="sticky s-cost"><span class="kind">cost</span>Total: ~$510 + 2 afternoons + a full day + a dented fridge<span class="note">~$510 all-in</span></div>
+      <div class="sticky s-gold"><span class="kind">ailb takeover</span>ailb releases payment only after the condition check passes</div>
+    </div>
+  </div>
+
+  <!-- LOOPS -->
+  <div class="loops">
+    <h2>It's not linear — it loops</h2>
+    <p>Draw the arrows and the "process" collapses into a few tight feedback loops. These are where people give up and call their cousins.</p>
+    <div class="loop-row">
+      <div class="loop">
+        <div class="nodes">Quote visit <span class="arr">↔</span> Vague price <span class="arr">↔</span> Another visit</div>
+        <div class="why">The visit treadmill. Each quote costs you an afternoon and still isn't firm or comparable — so getting a third opinion means losing a third afternoon.</div>
+      </div>
+      <div class="loop">
+        <div class="nodes">Cheap quote <span class="arr">↔</span> Day-of extras <span class="arr">↔</span> Final price &gt; expensive quote</div>
+        <div class="why">The lowball loop. The $300 guy ends at $510, past the $500 guy you rejected. The market punishes whoever believes a number.</div>
+      </div>
+      <div class="loop">
+        <div class="nodes">Zero insurance <span class="arr">↔</span> DIY photos <span class="arr">↔</span> Dispute dies anyway</div>
+        <div class="why">You document everything because there's no protection, then the documentation changes nothing because there's no referee. The distrust compounds into next move's paranoia.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAKEOVER -->
+  <div class="takeover">
+    <h2>Where ailb takes over (gold)</h2>
+    <p>The strongest opportunities aren't the lifting — that stays human. They're the surveying, specifying, comparing, and refereeing nobody is doing today.</p>
+    <div class="board">
+      <div class="sticky s-gold"><span class="kind">gold</span>Video survey replaces every quote visit</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Auto-build the inventory: items, volume, winch &amp; stairs flags</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Line-item quotes on one identical spec — finally comparable</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Inventory + condition photos = a real written contract</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Milestone supervision on moving day, with timestamps</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Payment released only on delivery condition-check</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Backup crew on standby if they no-show the handover date</div>
+    </div>
+  </div>
+
+  <!-- THE AILB FLOW -->
+  <div class="ailb-flow">
+    <h2>The <span class="brand">ailb</span> flow — same outcome, 5 steps</h2>
+    <p>What survives after delete → simplify → automate. The trucks and muscles stay human; the chaos around them doesn't.</p>
+    <div class="flow-steps">
+      <div class="flow-step"><div class="n">STEP 1</div><div class="t">Film your place</div><div class="d">You walk each room with your phone for ~3 minutes and send the video. That's the survey.</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">STEP 2</div><div class="t">Agent builds the spec</div><div class="d">Item inventory, estimated volume, floor numbers, winch/stairs flags — one written spec both sides can hold each other to.</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">STEP 3</div><div class="t">Comparable quotes</div><div class="d">Three movers price the same line-item spec, fixed. No visits, no "ya3ne approximately".</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">STEP 4</div><div class="t">You pick, agent locks</div><div class="d">You choose; the agent fixes date, crew size, and the contract (spec + condition photos + price).</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">STEP 5</div><div class="t">Supervised day</div><div class="d">Agent tracks ETA and milestones, logs the condition check at delivery, and releases payment only when it passes.</div></div>
+    </div>
+  </div>
+
+  <!-- VERDICT -->
+  <div class="verdict">
+    <h2>Verdict — should ailb disrupt this?</h2>
+    <div class="scores">
+      <div class="sc"><b>8/10</b>Pain density</div>
+      <div class="sc"><b>5/10</b>AI collapse ratio</div>
+      <div class="sc"><b>4/10</b>Frequency × market</div>
+      <div class="sc"><b>6/10</b>Demo feasibility by Saturday</div>
+    </div>
+    <p>The pain is real and the video-survey-to-comparable-quotes idea is genuinely novel — but the heart of the job stays stubbornly physical, people move maybe once every few years, and the trust layer (escrow, condition checks, backup crews) only works with operational muscle ailb won't have for a long time. <b>Recommendation: skip</b> for the hackathon — keep the video-survey concept in the deck as proof the pattern generalizes, and revisit once repair and beauty have built the provider network.</p>
+  </div>
+
+</div>
+</body>
+</html>

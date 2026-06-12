@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finding a private tutor — ailb reality map</title>
+<style>
+  :root{
+    --bg:#0d0d10;
+    --wall:#141419;
+    --text:#e8e8ea;
+    --muted:#8a8a92;
+    --line:#26262d;
+    --ink:#181410;
+    --gold:#f0c33c;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.45;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:40px 22px 90px;}
+
+  .crumb{font-size:13px;margin:0 0 18px;}
+  .crumb a{color:var(--muted);text-decoration:none;}
+  .crumb a:hover{color:var(--gold);}
+  .pillar-tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+    padding:5px 10px;border-radius:6px;margin-bottom:14px;border:1px solid;}
+  .pillar-products{color:#6db5ff;border-color:#27405e;background:#101a26;}
+  .pillar-services{color:#7ee0a3;border-color:#1f4a30;background:#0f1f16;}
+  .pillar-gov{color:#f0a35c;border-color:#5e3f1d;background:#221708;}
+
+  header.intro h1{font-size:30px;margin:0 0 10px;font-weight:700;letter-spacing:-.01em;}
+  header.intro p{margin:0;color:var(--muted);font-size:16px;max-width:760px;}
+  .persona{margin-top:14px;font-size:14.5px;color:var(--text);background:var(--wall);
+    border:1px solid var(--line);border-radius:10px;padding:12px 16px;max-width:760px;}
+  .persona b{color:var(--gold);}
+
+  /* Metrics bar */
+  .metrics{display:flex;gap:12px;flex-wrap:wrap;margin:26px 0 4px;}
+  .metric{background:var(--wall);border:1px solid var(--line);border-radius:10px;
+    padding:12px 18px;min-width:140px;}
+  .metric .label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;}
+  .metric .val{font-size:22px;font-weight:700;margin-top:3px;}
+  .metric .val .after{color:#7ee0a3;}
+  .metric .val .arrow{color:var(--muted);font-size:16px;margin:0 6px;}
+  .metric.score{border-color:#5c4d12;background:#1c1810;}
+  .metric.score .val{color:var(--gold);}
+
+  /* Legend */
+  .legend{display:flex;gap:14px;align-items:center;margin:26px 0 6px;flex-wrap:wrap;}
+  .leg{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--muted);
+       background:var(--wall);border:1px solid var(--line);padding:7px 12px;border-radius:8px;}
+  .chip{width:15px;height:15px;border-radius:3px;flex:none;}
+  .c-action{background:#5ec07e;} .c-decision{background:#5b9bd5;}
+  .c-pain{background:#e76d6d;} .c-gold{background:#f0c33c;} .c-trigger{background:#e4dcc4;}
+  .c-cost{background:#b78ee6;}
+
+  /* Stage band */
+  .stage{margin-top:40px;}
+  .stage > h2{font-size:13px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+       color:var(--muted);margin:0 0 4px;}
+  .stage > .hint{font-size:13px;color:#65656e;margin:0 0 16px;font-style:italic;}
+
+  .board{display:flex;flex-wrap:wrap;gap:14px;}
+
+  .sticky{
+    width:158px;min-height:150px;padding:15px 14px;border-radius:3px;
+    color:var(--ink);font-weight:600;font-size:14px;line-height:1.32;
+    box-shadow:0 7px 18px rgba(0,0,0,.45);
+    display:flex;flex-direction:column;
+    transition:transform .14s ease, box-shadow .14s ease;
+    position:relative;
+  }
+  .sticky .kind{font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;
+       opacity:.45;margin-bottom:9px;}
+  .sticky .note{margin-top:auto;padding-top:8px;font-size:11px;font-weight:700;opacity:.55;}
+  .sticky:hover{transform:rotate(0deg) translateY(-5px)!important;box-shadow:0 14px 28px rgba(0,0,0,.55);z-index:5;}
+  .board .sticky:nth-child(4n+1){transform:rotate(-1.6deg);}
+  .board .sticky:nth-child(4n+2){transform:rotate(1.2deg);}
+  .board .sticky:nth-child(4n+3){transform:rotate(-.7deg);}
+  .board .sticky:nth-child(4n+4){transform:rotate(1.8deg);}
+
+  .s-action{background:#5ec07e;}
+  .s-decision{background:#5b9bd5;}
+  .s-pain{background:#e76d6d;}
+  .s-gold{background:#f0c33c;}
+  .s-trigger{background:#e4dcc4;}
+  .s-cost{background:#b78ee6;}
+
+  /* Loops */
+  .loops{margin-top:54px;border-top:1px solid var(--line);padding-top:34px;}
+  .loops h2{font-size:22px;margin:0 0 6px;}
+  .loops > p{color:var(--muted);margin:0 0 22px;max-width:720px;}
+  .loop-row{display:flex;flex-wrap:wrap;gap:18px;}
+  .loop{background:var(--wall);border:1px solid var(--line);border-radius:12px;
+        padding:18px 20px;flex:1;min-width:240px;}
+  .loop .nodes{font-size:17px;font-weight:600;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .loop .arr{color:#e0584f;font-size:20px;}
+  .loop .why{color:var(--muted);font-size:13.5px;margin-top:10px;}
+
+  /* Gold takeover */
+  .takeover{margin-top:54px;border-top:1px solid var(--line);padding-top:34px;}
+  .takeover h2{font-size:22px;margin:0 0 6px;}
+  .takeover > p{color:var(--muted);margin:0 0 22px;max-width:740px;}
+
+  /* The ailb flow — the collapsed A-Z */
+  .ailb-flow{margin-top:54px;border-top:1px solid var(--line);padding-top:34px;}
+  .ailb-flow h2{font-size:22px;margin:0 0 6px;}
+  .ailb-flow h2 .brand{color:var(--gold);}
+  .ailb-flow > p{color:var(--muted);margin:0 0 22px;max-width:740px;}
+  .flow-steps{display:flex;flex-wrap:wrap;gap:0;align-items:stretch;}
+  .flow-step{background:#10180f;border:1px solid #2a4a28;border-radius:12px;
+    padding:16px 18px;width:215px;position:relative;}
+  .flow-step .n{font-size:11px;font-weight:800;color:#7ee0a3;letter-spacing:.1em;margin-bottom:7px;}
+  .flow-step .t{font-weight:700;font-size:15px;}
+  .flow-step .d{color:var(--muted);font-size:13px;margin-top:6px;}
+  .flow-arrow{align-self:center;color:#7ee0a3;font-size:22px;padding:0 10px;}
+
+  /* Verdict */
+  .verdict{margin-top:54px;border:1px solid #5c4d12;background:#1c1810;border-radius:14px;padding:24px 26px;}
+  .verdict h2{margin:0 0 8px;font-size:20px;color:var(--gold);}
+  .verdict .scores{display:flex;gap:20px;flex-wrap:wrap;margin:14px 0;}
+  .verdict .sc{font-size:13.5px;color:var(--muted);}
+  .verdict .sc b{color:var(--text);font-size:17px;display:block;}
+  .verdict p{margin:8px 0 0;color:var(--text);font-size:15px;max-width:820px;}
+
+  @media(max-width:520px){ .sticky{width:calc(50% - 7px);} .flow-step{width:100%;} .flow-arrow{display:none;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="crumb"><a href="index.html">← all 15 maps</a></p>
+  <span class="pillar-tag pillar-services">SERVICE MARKETPLACE</span>
+
+  <header class="intro">
+    <h1>Finding a private tutor — reality map</h1>
+    <p>Not a process diagram — a wall of what a parent actually experiences in Brevet/Bac season, A to Z. One sticky = one thought, decision, action, problem, or cost. Color reveals where ailb deletes, simplifies, or takes over.</p>
+    <div class="persona"><b>Nadine, 44, Furn el Chebbak</b> — her son Karim is in Brevet year, math is sinking fast, and every good tutor in the area is apparently "full since October".</div>
+  </header>
+
+  <!-- METRICS: today vs with ailb -->
+  <div class="metrics">
+    <div class="metric"><div class="label">Steps</div><div class="val">18<span class="arrow">→</span><span class="after">3</span></div></div>
+    <div class="metric"><div class="label">Time to right tutor</div><div class="val">~4 wks<span class="arrow">→</span><span class="after">~2 days</span></div></div>
+    <div class="metric"><div class="label">Paid trial sessions</div><div class="val">2<span class="arrow">→</span><span class="after">0</span></div></div>
+    <div class="metric"><div class="label">Pain points</div><div class="val">14<span class="arrow">→</span><span class="after">3</span></div></div>
+    <div class="metric score"><div class="label">Disruption score</div><div class="val">6.3 / 10</div></div>
+  </div>
+
+  <div class="legend">
+    <div class="leg"><span class="chip c-trigger"></span>Trigger / thought</div>
+    <div class="leg"><span class="chip c-action"></span>Action — a thing I do</div>
+    <div class="leg"><span class="chip c-decision"></span>Decision — a choice I make</div>
+    <div class="leg"><span class="chip c-pain"></span>Pain point / fear</div>
+    <div class="leg"><span class="chip c-cost"></span>Cost / fee / waiting</div>
+    <div class="leg"><span class="chip c-gold"></span>ailb takeover opportunity</div>
+  </div>
+
+  <div class="stage">
+    <h2>The bad grade</h2>
+    <p class="hint">Panic arrives stapled to a report card.</p>
+    <div class="board">
+      <div class="sticky s-trigger"><span class="kind">trigger</span>Karim got 4/20 in math. Brevet is in June.</div>
+      <div class="sticky s-trigger"><span class="kind">trigger</span>His teacher says "he needs private lessons" — the same teacher who gives private lessons</div>
+      <div class="sticky s-trigger"><span class="kind">trigger</span>Apparently every kid in his class already has a tutor</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>Is it my kid, the teacher, or the curriculum? Nobody can tell me.</div>
+      <div class="sticky s-decision"><span class="kind">decision</span>Start tutoring now, or wait for the next exam to be sure?</div>
+    </div>
+  </div>
+
+  <div class="stage">
+    <h2>The search</h2>
+    <p class="hint">The tutor market runs on mothers at school pickup.</p>
+    <div class="board">
+      <div class="sticky s-action"><span class="kind">action</span>Ask the moms at school pickup, one by one</div>
+      <div class="sticky s-action"><span class="kind">action</span>Post in the class WhatsApp group: "ba3rif chi ostez math mni7?"</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>The good ones are "full" — waiting lists since October</div>
+      <div class="sticky s-action"><span class="kind">action</span>Scroll FB groups for "prof de math Brevet"<span class="note">~1h, mostly ads</span></div>
+      <div class="sticky s-pain"><span class="kind">pain</span>Everyone swears by THEIR tutor — zero way to compare any of them</div>
+      <div class="sticky s-action"><span class="kind">action</span>Collect 6 numbers in my notes app</div>
+      <div class="sticky s-decision"><span class="kind">decision</span>University student ($) or veteran school teacher ($$$)?</div>
+      <div class="sticky s-cost"><span class="kind">cost</span>A week of asking around before first contact<span class="note">~1 wk</span></div>
+      <div class="sticky s-gold"><span class="kind">ailb takeover</span>ailb quizzes Karim in chat and finds where he's ACTUALLY weak</div>
+    </div>
+  </div>
+
+  <div class="stage">
+    <h2>Vetting &amp; price discovery</h2>
+    <p class="hint">Same subject, same class — and a 5× price spread nobody can explain.</p>
+    <div class="board">
+      <div class="sticky s-action"><span class="kind">action</span>WhatsApp tutor #1: "bkam el session?"</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>$7/hr to $35/hr for the same subject. Why? "Heyk."</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>Nobody can tell me what makes the $35 one worth 5× the $7 one</div>
+      <div class="sticky s-decision"><span class="kind">decision</span>Group sessions ($) or one-on-one ($$$)?</div>
+      <div class="sticky s-action"><span class="kind">action</span>Book a trial session to evaluate<span class="note">$15, one week wait</span></div>
+      <div class="sticky s-pain"><span class="kind">pain</span>Karim's verdict: "he explains worse than school." Back to zero.</div>
+      <div class="sticky s-action"><span class="kind">action</span>Trial #2 with the next name on the list<span class="note">another $15 + a week</span></div>
+      <div class="sticky s-cost"><span class="kind">cost</span>~$30 and two weeks burned on auditions<span class="note">~$30 + 2 wks</span></div>
+      <div class="sticky s-gold"><span class="kind">ailb takeover</span>ailb matches teaching style to my kid — with verifiable track records</div>
+    </div>
+  </div>
+
+  <div class="stage">
+    <h2>Logistics</h2>
+    <p class="hint">A weekly puzzle of school, traffic, and the generator schedule.</p>
+    <div class="board">
+      <div class="sticky s-decision"><span class="kind">decision</span>Our home, his place, or online?</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>Online dies at 6pm when the building switches to motor power</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>Tutor crosses half of Beirut — arrives 30 min late, leaves on time</div>
+      <div class="sticky s-action"><span class="kind">action</span>Build the weekly schedule around school + tutor + electricity</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>He cancels by voice note an hour before, "emergency"</div>
+      <div class="sticky s-decision"><span class="kind">decision</span>Tuesday 5pm or Saturday 9am — his only two open slots, take it or leave it</div>
+      <div class="sticky s-action"><span class="kind">action</span>Re-negotiate the slot again. Every single week.</div>
+      <div class="sticky s-cost"><span class="kind">cost</span>Brevet season is a seller's market — you take what you get<span class="note">waiting list ≈ leverage 0</span></div>
+      <div class="sticky s-gold"><span class="kind">ailb takeover</span>ailb owns the schedule — reshuffles around cuts and cancellations</div>
+    </div>
+  </div>
+
+  <div class="stage">
+    <h2>The grind</h2>
+    <p class="hint">Months of paying cash for a closed door.</p>
+    <div class="board">
+      <div class="sticky s-action"><span class="kind">action</span>Pay cash after every session<span class="note">$20 × 2/wk</span></div>
+      <div class="sticky s-pain"><span class="kind">pain</span>~$160/month. For ONE subject.</div>
+      <div class="sticky s-decision"><span class="kind">decision</span>Add physics? That's a second tutor and the whole search again.</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>I have no idea what happens in there — the door is closed</div>
+      <div class="sticky s-action"><span class="kind">action</span>Ask Karim "kifa el session?" — "mni7a." That's my entire progress report.</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>No homework trail, no notes, nothing written anywhere</div>
+      <div class="sticky s-cost"><span class="kind">cost</span>Two subjects ≈ $300/mo — more than bus + books combined<span class="note">~$300/mo</span></div>
+      <div class="sticky s-gold"><span class="kind">ailb takeover</span>ailb logs topics covered + sends me a progress pulse after each session</div>
+    </div>
+  </div>
+
+  <div class="stage">
+    <h2>Did it even work?</h2>
+    <p class="hint">The only metric arrives four months and $600 later.</p>
+    <div class="board">
+      <div class="sticky s-trigger"><span class="kind">trigger</span>Next exam: 9/20. Better! …is that the tutor, or an easier exam?</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>No baseline, no data — I literally cannot tell if this is working</div>
+      <div class="sticky s-decision"><span class="kind">decision</span>Switch tutors mid-year, or hold my nerve until June?</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>Switching = restarting the whole search, six weeks before Brevet</div>
+      <div class="sticky s-trigger"><span class="kind">trigger</span>He passed. We will never know what actually worked.</div>
+      <div class="sticky s-gold"><span class="kind">ailb takeover</span>ailb tracks progress against the official syllabus and flags gaps early</div>
+    </div>
+  </div>
+
+  <!-- LOOPS -->
+  <div class="loops">
+    <h2>It's not linear — it loops</h2>
+    <p>Draw the arrows and the "process" collapses into a few tight feedback loops. These are where parents get stuck, re-decide, and abandon.</p>
+    <div class="loop-row">
+      <div class="loop">
+        <div class="nodes">Trial <span class="arr">↔</span> "Not good" <span class="arr">↔</span> New search</div>
+        <div class="why">Trial roulette. Every spin costs ~$15 and a week — in a season where weeks are the scarcest resource a Brevet parent has.</div>
+      </div>
+      <div class="loop">
+        <div class="nodes">Schedule <span class="arr">↔</span> Generator hours <span class="arr">↔</span> Tutor availability</div>
+        <div class="why">Three calendars that never agree, renegotiated weekly over voice notes. One electricity cut knocks the whole week sideways.</div>
+      </div>
+      <div class="loop">
+        <div class="nodes">Grade dips <span class="arr">↔</span> Panic <span class="arr">↔</span> More sessions <span class="arr">↔</span> More cost</div>
+        <div class="why">With no progress data, the only response to fear is buying more hours — without ever learning whether the hours are the problem.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAKEOVER -->
+  <div class="takeover">
+    <h2>Where ailb takes over (gold)</h2>
+    <p>The strongest opportunities aren't the happy-path clicks — they're the things people genuinely don't want to do, and the things they currently can't see at all.</p>
+    <div class="board">
+      <div class="sticky s-gold"><span class="kind">gold</span>Diagnose the kid's actual gaps with a chat assessment</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Match tutor style + budget + zone — not just "a name from a mom"</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Show verifiable track records instead of trial roulette</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Explain the price: what $20/hr buys vs $35/hr</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Own the weekly schedule around cuts, traffic, cancellations</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Progress pulse after every session — open the closed door</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Track against the official syllabus, flag gaps in March not June</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Package payments — end the per-session cash ritual</div>
+    </div>
+  </div>
+
+  <!-- THE AILB FLOW -->
+  <div class="ailb-flow">
+    <h2>The <span class="brand">ailb</span> flow — same outcome, 5 steps</h2>
+    <p>What survives after delete → simplify → automate. The human tutor still teaches — everything around the teaching goes to the agent.</p>
+    <div class="flow-steps">
+      <div class="flow-step"><div class="n">STEP 1</div><div class="t">Tell the agent</div><div class="d">"Karim, Brevet, math, 4/20, Furn el Chebbak, ~$150/mo." One message from you.</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">STEP 2</div><div class="t">Agent assesses</div><div class="d">A 15-minute chat quiz with Karim pinpoints the real gaps — maybe it's algebra basics from two years ago, not this year's chapter.</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">STEP 3</div><div class="t">Agent matches</div><div class="d">Two vetted tutors with real prices, track records, and slots that survive your generator schedule. You pick.</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">STEP 4</div><div class="t">Sessions run themselves</div><div class="d">Agent confirms, reschedules around cuts, handles payment per package. The tutor teaches; nobody renegotiates Tuesdays.</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">STEP 5</div><div class="t">Progress pulses</div><div class="d">After each session: topics covered, syllabus coverage %, early warning if June looks risky. You finally see through the door.</div></div>
+    </div>
+  </div>
+
+  <!-- VERDICT -->
+  <div class="verdict">
+    <h2>Verdict — should ailb disrupt this?</h2>
+    <div class="scores">
+      <div class="sc"><b>6/10</b>Pain density</div>
+      <div class="sc"><b>6/10</b>AI collapse ratio</div>
+      <div class="sc"><b>7/10</b>Frequency × market</div>
+      <div class="sc"><b>6/10</b>Demo feasibility by Saturday</div>
+    </div>
+    <p>The deepest insight here isn't matching — it's that parents are flying blind for months: the real product is the progress loop (assessment → session logs → syllabus tracking), which is also the part that takes longest to make credible. Matching alone is a thinner win than home repair, and the tutoring relationship itself can't be compressed. <b>Recommendation: roadmap</b> — strong seasonal wedge (exam-season panic is a marketing gift), but not the Saturday demo.</p>
+  </div>
+
+</div>
+</body>
+</html>
