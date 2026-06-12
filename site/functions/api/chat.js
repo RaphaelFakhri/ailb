@@ -9,6 +9,12 @@ export async function onRequestPost(context) {
   if (message.length < 1 || message.length > 4000) {
     return json({ error: "invalid_message" }, 400);
   }
+  // optional photo: jpeg data URL, already downscaled client-side (~≤500KB)
+  let image = null;
+  if (typeof body?.image === "string" && body.image.startsWith("data:image/jpeg;base64,")) {
+    if (body.image.length > 4 * 1024 * 1024) return json({ error: "image_too_large" }, 413);
+    image = body.image;
+  }
 
   // Forward to the OpenClaw relay; the agent can take a while — just await.
   let res;
@@ -23,6 +29,7 @@ export async function onRequestPost(context) {
         sessionKey: `web:${phone}`,
         message,
         phone: "+" + phone,
+        ...(image ? { image } : {}),
       }),
     });
   } catch {

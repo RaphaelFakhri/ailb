@@ -1,0 +1,35 @@
+[Unit]
+Description=ailb OpenClaw gateway (WhatsApp)
+After=network-online.target
+
+[Service]
+Environment=PATH=/home/opc/.asdf/shims:/home/opc/.asdf/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/home/opc/.ailb-npm/bin/openclaw --profile ailb gateway --port 18790
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target
+[Unit]
+Description=ailb relay (openclaw bridge)
+After=network-online.target
+
+[Service]
+Environment=RELAY_SECRET=REDACTED
+ExecStart=/home/opc/.asdf/installs/nodejs/24.16.0/bin/node /home/opc/ailb-relay/server.js
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=default.target
+[Unit]
+Description=ailb cloudflared tunnel
+After=network-online.target
+
+[Service]
+ExecStart=/home/opc/bin/cloudflared tunnel run --token REDACTED
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target

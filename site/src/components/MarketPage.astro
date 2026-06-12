@@ -117,6 +117,7 @@ const navItems = [
     <ul id="mk-grid" class="mk-grid" aria-live="polite">
       {[1, 2, 3, 4, 5, 6].map(() => (
         <li class="mk-card" aria-hidden="true">
+          <div class="mk-skel-line" style="width: 100%; height: 160px; border-radius: 14px;"></div>
           <div class="mk-skel-line" style="width: 62%; height: 18px;"></div>
           <div class="mk-skel-line" style="width: 34%;"></div>
           <div class="mk-skel-line" style="width: 100%;"></div>
@@ -155,6 +156,43 @@ const navItems = [
     background: #faf9f7; border: 1px solid #efece6;
     font-family: var(--font-body, "Red Hat Text", ui-sans-serif, system-ui, sans-serif);
   }
+  /* Photo carousel: native horizontal scroll + snap does mobile swipe for
+     free; the arrows just scrollBy one frame for mouse users. */
+  .mk-photos { position: relative; margin: -8px 0 2px; }
+  .mk-strip {
+    display: flex; overflow-x: auto; scroll-snap-type: x mandatory;
+    border-radius: 14px; aspect-ratio: 4 / 3; background: #efece6;
+    scrollbar-width: none;
+  }
+  .mk-strip::-webkit-scrollbar { display: none; }
+  .mk-strip img {
+    flex: 0 0 100%; width: 100%; height: 100%;
+    object-fit: cover; scroll-snap-align: start; scroll-snap-stop: always;
+  }
+  .mk-arrow {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 32px; height: 32px; border-radius: 50%; border: none;
+    background: rgba(255, 255, 255, 0.92); color: #1d386a; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; line-height: 1; box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+    opacity: 0; transition: opacity 0.15s ease;
+  }
+  .mk-photos:hover .mk-arrow, .mk-photos:focus-within .mk-arrow { opacity: 1; }
+  /* touch devices have no hover — swipe is the gesture, keep arrows hidden */
+  @media (hover: none) { .mk-photos:hover .mk-arrow { opacity: 0; } }
+  .mk-arrow[data-dir="-1"] { left: 8px; }
+  .mk-arrow[data-dir="1"] { right: 8px; }
+  .mk-dots {
+    position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%);
+    display: flex; gap: 5px; pointer-events: none;
+  }
+  .mk-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: rgba(255, 255, 255, 0.55);
+    transition: background-color 0.15s ease;
+  }
+  .mk-dot.is-on { background: #ffffff; }
+
   .mk-badge {
     align-self: flex-start; display: inline-flex; align-items: center;
     padding: 3px 10px; border-radius: 100px;
@@ -185,6 +223,21 @@ const navItems = [
     transition: background-color 0.2s ease, color 0.2s ease;
   }
   .mk-ask:hover { background: #1d386a; color: #ffffff; }
+  /* owned gov files: filled blue so "yours" pops against the outlined Start buttons */
+  .mk-ask.mk-ask-filled { background: #1d386a; color: #ffffff; }
+  .mk-ask.mk-ask-filled:hover { background: #16294e; }
+  .mk-actions { margin-top: auto; display: flex; gap: 8px; }
+  .mk-actions .mk-ask { margin-top: 0; }
+  .mk-print { padding: 0 13px; }
+
+  .mk-card.mk-spot {
+    border-color: #f2c84b;
+    box-shadow: 0 0 0 3px #f2c84b66;
+    animation: mk-spot-pulse 1.2s ease 3;
+  }
+  @keyframes mk-spot-pulse {
+    50% { box-shadow: 0 0 0 8px #f2c84b33; }
+  }
 
   .mk-center { display: flex; justify-content: center; padding: 30px 0; }
   .mk-panel {
@@ -244,8 +297,56 @@ const navItems = [
     return n;
   }
 
+  function photos(l) {
+    var wrap = el("div", "mk-photos");
+    var strip = el("div", "mk-strip");
+    strip.setAttribute("aria-label", (l.title || "Listing") + " photos");
+    l.images.forEach(function (src, i) {
+      var img = document.createElement("img");
+      img.src = src;
+      img.alt = (l.title || "Listing") + " — photo " + (i + 1);
+      img.loading = "lazy";
+      strip.appendChild(img);
+    });
+    wrap.appendChild(strip);
+    if (l.images.length < 2) return wrap;
+
+    var dots = el("div", "mk-dots");
+    l.images.forEach(function () { dots.appendChild(el("span", "mk-dot")); });
+    wrap.appendChild(dots);
+
+    function current() {
+      return Math.round(strip.scrollLeft / strip.clientWidth);
+    }
+    function paint() {
+      var on = current();
+      Array.prototype.forEach.call(dots.children, function (d, i) {
+        d.classList.toggle("is-on", i === on);
+      });
+    }
+    strip.addEventListener("scroll", paint, { passive: true });
+    paint();
+
+    [-1, 1].forEach(function (dir) {
+      var b = el("button", "mk-arrow", dir < 0 ? "‹" : "›");
+      b.type = "button";
+      b.setAttribute("data-dir", String(dir));
+      b.setAttribute("aria-label", dir < 0 ? "Previous photo" : "Next photo");
+      b.addEventListener("click", function () {
+        // wrap around at the ends so the arrows never dead-end
+        var n = l.images.length;
+        var next = (current() + dir + n) % n;
+        strip.scrollTo({ left: next * strip.clientWidth, behavior: "smooth" });
+      });
+      wrap.appendChild(b);
+    });
+    return wrap;
+  }
+
   function card(l) {
     var li = el("li", "mk-card");
+    if (l.id) li.id = "l-" + l.id;
+    if (l.images && l.images.length) li.appendChild(photos(l));
     if (l.agentVerified) li.appendChild(el("span", "mk-badge", "✓ agent-verified"));
 
     var head = el("div", "mk-card-head");
@@ -267,22 +368,81 @@ const navItems = [
       li.appendChild(tags);
     }
 
-    var ask = el("button", "mk-ask", askLabel);
+    var ask = el(
+      "button",
+      l.mine ? "mk-ask mk-ask-filled" : "mk-ask",
+      l.mine ? "Continue this file" : askLabel
+    );
     ask.type = "button";
     ask.addEventListener("click", function () {
       openChat(
-        gated
-          ? "Start my " + (l.title || "government") + " file. "
-          : 'About "' + (l.title || "") + '" — '
+        l.mine
+          ? "Continue my file: " + (l.title || "") + ". "
+          : gated
+            ? "Start my " + (l.title || "government") + " file. "
+            : 'About "' + (l.title || "") + '" — '
       );
     });
-    li.appendChild(ask);
+    if (!l.mine) {
+      li.appendChild(ask);
+      return li;
+    }
+    var row = el("div", "mk-actions");
+    row.appendChild(ask);
+    var print = el("button", "mk-ask mk-print");
+    print.type = "button";
+    print.setAttribute("aria-label", "Preview and print this file");
+    print.innerHTML =
+      '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M6 2h12v5h1.5A2.5 2.5 0 0 1 22 9.5v7a1.5 1.5 0 0 1-1.5 1.5H18v4H6v-4H3.5A1.5 1.5 0 0 1 2 16.5v-7A2.5 2.5 0 0 1 4.5 7H6V2Zm2 5h8V4H8v3Zm8 8H8v6h8v-6Zm3-3.25a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"/></svg>';
+    print.addEventListener("click", function () { printFile(l); });
+    row.appendChild(print);
+    li.appendChild(row);
     return li;
+  }
+
+  // print-friendly preview of a personal gov file: everything we hold —
+  // status checklist (desc), attached docs/images, dates.
+  function printFile(l) {
+    var w = window.open("", "_blank", "width=720,height=900");
+    if (!w) return;
+    function esc(s) {
+      return String(s || "").replace(/[&<>"]/g, function (c) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+      });
+    }
+    // the desc is the living checklist — break " / " segments onto lines
+    var status = esc(l.desc).replace(/\s\/\s/g, "<br>");
+    var imgs = (l.images || []).map(function (src) {
+      return '<img src="' + esc(location.origin + src) + '" alt="attached document">';
+    }).join("");
+    w.document.write(
+      "<!doctype html><html><head><title>" + esc(l.title) + " — ailb</title><style>" +
+      "body{font-family:ui-sans-serif,system-ui,sans-serif;color:#1a1a1a;max-width:640px;margin:40px auto;padding:0 24px;}" +
+      "h1{font-size:22px;margin:0 0 4px;} .meta{color:#545454;font-size:13px;margin-bottom:20px;}" +
+      ".status{background:#faf9f7;border:1px solid #efece6;border-radius:12px;padding:18px;font-size:14px;line-height:1.8;}" +
+      "img{max-width:100%;border-radius:10px;margin-top:14px;border:1px solid #efece6;}" +
+      ".brand{color:#1d386a;font-weight:700;margin-bottom:24px;} .footer{color:#8a8a8a;font-size:11px;margin-top:28px;}" +
+      ".print-btn{margin:18px 0;padding:10px 24px;border-radius:100px;border:none;background:#1d386a;color:#fff;cursor:pointer;font-size:13px;}" +
+      "@media print{.print-btn{display:none}}" +
+      "</style></head><body>" +
+      '<div class="brand">ailb 🟡 — your file</div>' +
+      "<h1>" + esc(l.title) + "</h1>" +
+      '<div class="meta">' + esc(l.location || "") + (l.ts ? " · last updated " + new Date(l.ts).toLocaleDateString() : "") + "</div>" +
+      '<div class="status">' + status + "</div>" + imgs +
+      '<button class="print-btn" onclick="window.print()">Print</button>' +
+      '<div class="footer">Generated by ailb.pages.dev — everything above was collected in your WhatsApp/web chat. Documents stay private to your login.</div>' +
+      "</body></html>"
+    );
+    w.document.close();
   }
 
   function load() {
     hide(errorEl); hide(emptyEl); show(grid);
-    fetch("/api/listings?type=" + encodeURIComponent(type))
+    // gov files are per-user: the token scopes the response to YOUR files
+    var headers = {};
+    var tok = gated && localStorage.getItem("ailb_token");
+    if (tok) headers.authorization = "Bearer " + tok;
+    fetch("/api/listings?type=" + encodeURIComponent(type), { headers: headers })
       .then(function (r) {
         if (!r.ok) throw new Error("http " + r.status);
         return r.json();
@@ -292,6 +452,16 @@ const navItems = [
         grid.innerHTML = "";
         if (!list.length) { hide(grid); show(emptyEl); return; }
         list.forEach(function (l) { grid.appendChild(card(l)); });
+        // deep link: /things/#l-<id> scrolls to and spotlights that card
+        // (cards render after fetch, so the browser's native anchor jump
+        // already missed — do it manually)
+        if (location.hash.indexOf("#l-") === 0) {
+          var target = document.getElementById(location.hash.slice(1));
+          if (target) {
+            target.classList.add("mk-spot");
+            target.scrollIntoView({ behavior: "smooth", block: "center" });
+          }
+        }
       })
       .catch(function () {
         grid.innerHTML = "";

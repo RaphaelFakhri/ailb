@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Becoming a service provider — ailb reality map</title>
+<style>
+  :root{
+    --bg:#0d0d10;
+    --wall:#141419;
+    --text:#e8e8ea;
+    --muted:#8a8a92;
+    --line:#26262d;
+    --ink:#181410;
+    --gold:#f0c33c;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.45;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:40px 22px 90px;}
+
+  .crumb{font-size:13px;margin:0 0 18px;}
+  .crumb a{color:var(--muted);text-decoration:none;}
+  .crumb a:hover{color:var(--gold);}
+  .pillar-tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+    padding:5px 10px;border-radius:6px;margin-bottom:14px;border:1px solid;}
+  .pillar-products{color:#6db5ff;border-color:#27405e;background:#101a26;}
+  .pillar-services{color:#7ee0a3;border-color:#1f4a30;background:#0f1f16;}
+  .pillar-gov{color:#f0a35c;border-color:#5e3f1d;background:#221708;}
+
+  header.intro h1{font-size:30px;margin:0 0 10px;font-weight:700;letter-spacing:-.01em;}
+  header.intro p{margin:0;color:var(--muted);font-size:16px;max-width:760px;}
+  .persona{margin-top:14px;font-size:14.5px;color:var(--text);background:var(--wall);
+    border:1px solid var(--line);border-radius:10px;padding:12px 16px;max-width:760px;}
+  .persona b{color:var(--gold);}
+
+  /* Metrics bar */
+  .metrics{display:flex;gap:12px;flex-wrap:wrap;margin:26px 0 4px;}
+  .metric{background:var(--wall);border:1px solid var(--line);border-radius:10px;
+    padding:12px 18px;min-width:140px;}
+  .metric .label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;}
+  .metric .val{font-size:22px;font-weight:700;margin-top:3px;}
+  .metric .val .after{color:#7ee0a3;}
+  .metric .val .arrow{color:var(--muted);font-size:16px;margin:0 6px;}
+  .metric.score{border-color:#5c4d12;background:#1c1810;}
+  .metric.score .val{color:var(--gold);}
+
+  /* Legend */
+  .legend{display:flex;gap:14px;align-items:center;margin:26px 0 6px;flex-wrap:wrap;}
+  .leg{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--muted);
+       background:var(--wall);border:1px solid var(--line);padding:7px 12px;border-radius:8px;}
+  .chip{width:15px;height:15px;border-radius:3px;flex:none;}
+  .c-action{background:#5ec07e;} .c-decision{background:#5b9bd5;}
+  .c-pain{background:#e76d6d;} .c-gold{background:#f0c33c;} .c-trigger{background:#e4dcc4;}
+  .c-cost{background:#b78ee6;}
+
+  /* Stage band */
+  .stage{margin-top:40px;}
+  .stage > h2{font-size:13px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+       color:var(--muted);margin:0 0 4px;}
+  .stage > .hint{font-size:13px;color:#65656e;margin:0 0 16px;font-style:italic;}
+
+  .board{display:flex;flex-wrap:wrap;gap:14px;}
+
+  .sticky{
+    width:158px;min-height:150px;padding:15px 14px;border-radius:3px;
+    color:var(--ink);font-weight:600;font-size:14px;line-height:1.32;
+    box-shadow:0 7px 18px rgba(0,0,0,.45);
+    display:flex;flex-direction:column;
+    transition:transform .14s ease, box-shadow .14s ease;
+    position:relative;
+  }
+  .sticky .kind{font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;
+       opacity:.45;margin-bottom:9px;}
+  .sticky .note{margin-top:auto;padding-top:8px;font-size:11px;font-weight:700;opacity:.55;}
+  .sticky:hover{transform:rotate(0deg) translateY(-5px)!important;box-shadow:0 14px 28px rgba(0,0,0,.55);z-index:5;}
+  .board .sticky:nth-child(4n+1){transform:rotate(-1.6deg);}
+  .board .sticky:nth-child(4n+2){transform:rotate(1.2deg);}
+  .board .sticky:nth-child(4n+3){transform:rotate(-.7deg);}
+  .board .sticky:nth-child(4n+4){transform:rotate(1.8deg);}
+
+  .s-action{background:#5ec07e;}
+  .s-decision{background:#5b9bd5;}
+  .s-pain{background:#e76d6d;}
+  .s-gold{background:#f0c33c;}
+  .s-trigger{background:#e4dcc4;}
+  .s-cost{background:#b78ee6;}
+
+  /* Loops */
+  .loops{margin-top:54px;border-top:1px solid var(--line);padding-top:34px;}
+  .loops h2{font-size:22px;margin:0 0 6px;}
+  .loops > p{color:var(--muted);margin:0 0 22px;max-width:720px;}
+  .loop-row{display:flex;flex-wrap:wrap;gap:18px;}
+  .loop{background:var(--wall);border:1px solid var(--line);border-radius:12px;
+        padding:18px 20px;flex:1;min-width:240px;}
+  .loop .nodes{font-size:17px;font-weight:600;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .loop .arr{color:#e0584f;font-size:20px;}
+  .loop .why{color:var(--muted);font-size:13.5px;margin-top:10px;}
+
+  /* Gold takeover */
+  .takeover{margin-top:54px;border-top:1px solid var(--line);padding-top:34px;}
+  .takeover h2{font-size:22px;margin:0 0 6px;}
+  .takeover > p{color:var(--muted);margin:0 0 22px;max-width:740px;}
+
+  /* The ailb flow — the collapsed A-Z */
+  .ailb-flow{margin-top:54px;border-top:1px solid var(--line);padding-top:34px;}
+  .ailb-flow h2{font-size:22px;margin:0 0 6px;}
+  .ailb-flow h2 .brand{color:var(--gold);}
+  .ailb-flow > p{color:var(--muted);margin:0 0 22px;max-width:740px;}
+  .flow-steps{display:flex;flex-wrap:wrap;gap:0;align-items:stretch;}
+  .flow-step{background:#10180f;border:1px solid #2a4a28;border-radius:12px;
+    padding:16px 18px;width:215px;position:relative;}
+  .flow-step .n{font-size:11px;font-weight:800;color:#7ee0a3;letter-spacing:.1em;margin-bottom:7px;}
+  .flow-step .t{font-weight:700;font-size:15px;}
+  .flow-step .d{color:var(--muted);font-size:13px;margin-top:6px;}
+  .flow-arrow{align-self:center;color:#7ee0a3;font-size:22px;padding:0 10px;}
+
+  /* Verdict */
+  .verdict{margin-top:54px;border:1px solid #5c4d12;background:#1c1810;border-radius:14px;padding:24px 26px;}
+  .verdict h2{margin:0 0 8px;font-size:20px;color:var(--gold);}
+  .verdict .scores{display:flex;gap:20px;flex-wrap:wrap;margin:14px 0;}
+  .verdict .sc{font-size:13.5px;color:var(--muted);}
+  .verdict .sc b{color:var(--text);font-size:17px;display:block;}
+  .verdict p{margin:8px 0 0;color:var(--text);font-size:15px;max-width:820px;}
+
+  @media(max-width:520px){ .sticky{width:calc(50% - 7px);} .flow-step{width:100%;} .flow-arrow{display:none;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="crumb"><a href="index.html">← all 15 maps</a></p>
+  <span class="pillar-tag pillar-services">SERVICE MARKETPLACE</span>
+
+  <header class="intro">
+    <h1>Becoming a service provider — reality map</h1>
+    <p>The supply side. Not a process diagram — a wall of what a Lebanese freelancer actually experiences trying to turn skill into clients. One sticky = one thought, decision, action, problem, or cost. Color reveals where ailb deletes, simplifies, or takes over.</p>
+    <div class="persona"><b>Elie, 31, Dekwaneh</b> — electrician with 8 years of real experience, zero online presence, and a client list that lives in other people's heads.</div>
+  </header>
+
+  <!-- METRICS: today vs with ailb -->
+  <div class="metrics">
+    <div class="metric"><div class="label">Steps</div><div class="val">16<span class="arrow">→</span><span class="after">3</span></div></div>
+    <div class="metric"><div class="label">Time to a pipeline</div><div class="val">~3 mo<span class="arrow">→</span><span class="after">~1 wk</span></div></div>
+    <div class="metric"><div class="label">Wasted trips / mo</div><div class="val">~3<span class="arrow">→</span><span class="after">0</span></div></div>
+    <div class="metric"><div class="label">Pain points</div><div class="val">16<span class="arrow">→</span><span class="after">3</span></div></div>
+    <div class="metric score"><div class="label">Disruption score</div><div class="val">8.0 / 10</div></div>
+  </div>
+
+  <div class="legend">
+    <div class="leg"><span class="chip c-trigger"></span>Trigger / thought</div>
+    <div class="leg"><span class="chip c-action"></span>Action — a thing I do</div>
+    <div class="leg"><span class="chip c-decision"></span>Decision — a choice I make</div>
+    <div class="leg"><span class="chip c-pain"></span>Pain point / fear</div>
+    <div class="leg"><span class="chip c-cost"></span>Cost / fee / waiting</div>
+    <div class="leg"><span class="chip c-gold"></span>ailb takeover opportunity</div>
+  </div>
+
+  <div class="stage">
+    <h2>The jump</h2>
+    <p class="hint">The skill exists. The market for it is invisible.</p>
+    <div class="board">
+      <div class="sticky s-trigger"><span class="kind">trigger</span>The company pays me in lira at a rate they invented</div>
+      <div class="sticky s-trigger"><span class="kind">trigger</span>I'm good at this. Why am I making $600/month for someone else?</div>
+      <div class="sticky s-trigger"><span class="kind">trigger</span>My cousin freelances and bought a car. A used car. Still.</div>
+      <div class="sticky s-decision"><span class="kind">decision</span>Go on my own, or keep the safe-ish salary?</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>No clients lined up. No savings buffer. No plan B.</div>
+    </div>
+  </div>
+
+  <div class="stage">
+    <h2>Getting seen</h2>
+    <p class="hint">Marketing, as performed by someone whose actual job is wiring.</p>
+    <div class="board">
+      <div class="sticky s-action"><span class="kind">action</span>Print 200 business cards<span class="note">$30, most die in drawers</span></div>
+      <div class="sticky s-action"><span class="kind">action</span>Make an Instagram page. 11 followers. All family.</div>
+      <div class="sticky s-action"><span class="kind">action</span>Post in 6 FB groups: "electrician, all areas, best prices"</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>My post drowns under 50 identical posts within the hour</div>
+      <div class="sticky s-action"><span class="kind">action</span>Ask every old client to "tell their friends"</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>Word of mouth is my only channel — and I can't steer it</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>No way to look "certified" — there's no certification anything here</div>
+      <div class="sticky s-decision"><span class="kind">decision</span>Pay $50 to boost a post I don't know how to write?</div>
+      <div class="sticky s-cost"><span class="kind">cost</span>~$80 on cards and boosts. Jobs gained: zero.<span class="note">~$80, month 1</span></div>
+      <div class="sticky s-gold"><span class="kind">ailb takeover</span>ailb interviews me on WhatsApp and builds my profile FOR me</div>
+    </div>
+  </div>
+
+  <div class="stage">
+    <h2>The price race</h2>
+    <p class="hint">When nobody can prove quality, everybody competes on price.</p>
+    <div class="board">
+      <div class="sticky s-trigger"><span class="kind">trigger</span>First inquiry! "Bkam to redo the bathroom wiring?"</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>Quote high, I lose him. Quote low, I starve. Every time.</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>He compares me to "a guy who'll do it for half" — no questions about the half guy's work</div>
+      <div class="sticky s-action"><span class="kind">action</span>Undercut anyway, just to get the first jobs<span class="note">working below cost</span></div>
+      <div class="sticky s-pain"><span class="kind">pain</span>I can't PROVE I'm better. No reviews, no portfolio anyone trusts.</div>
+      <div class="sticky s-decision"><span class="kind">decision</span>Take the far job in Jbeil? The gas eats the margin.</div>
+      <div class="sticky s-cost"><span class="kind">cost</span>First month: 3 jobs, ~$190 total<span class="note">~$190 / month 1</span></div>
+      <div class="sticky s-gold"><span class="kind">ailb takeover</span>ailb quotes for me from the client's photos + my rate card</div>
+    </div>
+  </div>
+
+  <div class="stage">
+    <h2>Juggling the work</h2>
+    <p class="hint">My calendar is my memory plus a paper notebook from 2019.</p>
+    <div class="board">
+      <div class="sticky s-action"><span class="kind">action</span>Schedule jobs in my head and a notebook in the van</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>Double-booked Tuesday. Lost both clients. Both told their friends.</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>Client reschedules by voice note at 11pm. I hear it at 7am.</div>
+      <div class="sticky s-action"><span class="kind">action</span>Drive 40 min to a job. Client not home. "Nsit, sorry!"</div>
+      <div class="sticky s-cost"><span class="kind">cost</span>Half a day + gas lost on every no-show<span class="note">~$15 + 4h, ~3×/mo</span></div>
+      <div class="sticky s-decision"><span class="kind">decision</span>Confirm every job by phone the night before — one by one?</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>While I'm on a ladder, I'm missing the calls that are next month's income</div>
+      <div class="sticky s-gold"><span class="kind">ailb takeover</span>ailb runs my calendar and confirms every client for me</div>
+    </div>
+  </div>
+
+  <div class="stage">
+    <h2>Getting paid</h2>
+    <p class="hint">The hardest wiring job is asking for the money.</p>
+    <div class="board">
+      <div class="sticky s-action"><span class="kind">action</span>Finish the job, say the amount out loud, look at the floor</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>"Ma3i bas lira" — paid in lira at yesterday's rate. Or last month's.</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>"I'll pay you next week." I will chase him for a month.</div>
+      <div class="sticky s-action"><span class="kind">action</span>Send WhatsApp reminder #4, worded politely so I don't lose the referral</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>One client just ghosted. $140 gone. No contract, no proof, no recourse.</div>
+      <div class="sticky s-decision"><span class="kind">decision</span>Demand deposits? Clients here refuse deposits from "a guy".</div>
+      <div class="sticky s-cost"><span class="kind">cost</span>~15% of what I earn is "pending" forever<span class="note">~15% never collected</span></div>
+      <div class="sticky s-gold"><span class="kind">ailb takeover</span>ailb confirms price in writing before I pick up a screwdriver</div>
+    </div>
+  </div>
+
+  <div class="stage">
+    <h2>Trying to grow</h2>
+    <p class="hint">Good work disappears the moment it's finished.</p>
+    <div class="board">
+      <div class="sticky s-pain"><span class="kind">pain</span>Happy clients say "I'll recommend you!" — then life happens</div>
+      <div class="sticky s-action"><span class="kind">action</span>Beg clients for a Google review. Nobody knows how to leave one.</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>My best work has zero photos. I never remember to take them.</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>One quiet month = zero pipeline. No funnel, no visibility, just waiting.</div>
+      <div class="sticky s-decision"><span class="kind">decision</span>Crawl back to a salary job?</div>
+      <div class="sticky s-trigger"><span class="kind">trigger</span>A repeat client calls back. The only channel that ever worked.</div>
+      <div class="sticky s-gold"><span class="kind">ailb takeover</span>ailb collects ratings + job photos automatically, every job</div>
+      <div class="sticky s-gold"><span class="kind">ailb takeover</span>ailb matches me to jobs that fit my skills, zone, and schedule</div>
+    </div>
+  </div>
+
+  <!-- LOOPS -->
+  <div class="loops">
+    <h2>It's not linear — it loops</h2>
+    <p>Draw the arrows and the "process" collapses into a few tight feedback loops. These are where providers get stuck, burn out, and go back to salaries.</p>
+    <div class="loop-row">
+      <div class="loop">
+        <div class="nodes">No proof of quality <span class="arr">↔</span> Undercut <span class="arr">↔</span> No margin</div>
+        <div class="why">The race to the bottom. Can't prove quality → compete on price → no margin to invest in anything that would prove quality. Lebanon's entire informal service economy runs in this loop.</div>
+      </div>
+      <div class="loop">
+        <div class="nodes">On a ladder <span class="arr">↔</span> Missed calls <span class="arr">↔</span> Thinner pipeline</div>
+        <div class="why">Doing the work blocks selling the work. A one-man business has no receptionist — every working hour quietly cannibalizes next month's income.</div>
+      </div>
+      <div class="loop">
+        <div class="nodes">No reviews <span class="arr">↔</span> Cheap clients <span class="arr">↔</span> No reviews</div>
+        <div class="why">Without reviews you only win price-shoppers, and price-shoppers don't leave reviews. The reputation flywheel never starts spinning.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAKEOVER -->
+  <div class="takeover">
+    <h2>Where ailb takes over (gold)</h2>
+    <p>The strongest opportunities aren't the happy-path clicks — they're the things people genuinely don't want to do. For providers, that's everything except the craft itself.</p>
+    <div class="board">
+      <div class="sticky s-gold"><span class="kind">gold</span>Interview me conversationally — build my profile from a chat</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Turn my answers + photos into a portfolio I'd never write myself</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Quote jobs for me from client photos + my rates</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Run my calendar — confirmations, reminders, reshuffles</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Lock the price in writing before work starts</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Chase late payments politely so I don't have to</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Collect reviews + after-photos automatically post-job</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Feed me matched jobs in my zone instead of FB spam wars</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Nudge past clients for rebooking — make word of mouth a system</div>
+    </div>
+  </div>
+
+  <!-- THE AILB FLOW -->
+  <div class="ailb-flow">
+    <h2>The <span class="brand">ailb</span> flow — same outcome, 5 steps</h2>
+    <p>What survives after delete → simplify → automate. The human only does what only the human can do: the craft.</p>
+    <div class="flow-steps">
+      <div class="flow-step"><div class="n">STEP 1</div><div class="t">Talk about yourself</div><div class="d">A ~10-minute WhatsApp chat. The agent asks what you do, where, since when, your rates, your best jobs. You just answer — voice notes welcome.</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">STEP 2</div><div class="t">Agent builds your business</div><div class="d">Profile, service list, rate card, coverage zone, portfolio drafted from your answers. You approve it; you don't write it.</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">STEP 3</div><div class="t">Agent feeds you jobs</div><div class="d">Pre-qualified clients in your zone, with photos of the problem and a quote already prepared from your rates. Accept or pass.</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">STEP 4</div><div class="t">You do the work</div><div class="d">The only step that was ever really yours. The agent confirms the client the night before — no more ghost trips.</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">STEP 5</div><div class="t">Agent compounds it</div><div class="d">Collects payment record, review, and photos; nudges repeat clients. Your reputation finally accumulates somewhere.</div></div>
+    </div>
+  </div>
+
+  <!-- VERDICT -->
+  <div class="verdict">
+    <h2>Verdict — should ailb disrupt this?</h2>
+    <div class="scores">
+      <div class="sc"><b>7/10</b>Pain density</div>
+      <div class="sc"><b>8/10</b>AI collapse ratio</div>
+      <div class="sc"><b>7/10</b>Frequency × market</div>
+      <div class="sc"><b>10/10</b>Demo feasibility by Saturday</div>
+    </div>
+    <p>This is the map where ailb's chat-first thesis is strongest: the onboarding interview IS the product, and it needs zero existing supply to demo — a judge can play Elie live and watch the agent turn ten voice-note answers into a real business profile with rates, zone, and portfolio. It's also the strategic unlock: every provider interviewed here becomes the supply for the other four maps. <b>Recommendation: hackathon demo flow</b> — open the pitch with it.</p>
+  </div>
+
+</div>
+</body>
+</html>

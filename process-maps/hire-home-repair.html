@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hiring home repair — ailb reality map</title>
+<style>
+  :root{
+    --bg:#0d0d10;
+    --wall:#141419;
+    --text:#e8e8ea;
+    --muted:#8a8a92;
+    --line:#26262d;
+    --ink:#181410;
+    --gold:#f0c33c;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.45;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:40px 22px 90px;}
+
+  .crumb{font-size:13px;margin:0 0 18px;}
+  .crumb a{color:var(--muted);text-decoration:none;}
+  .crumb a:hover{color:var(--gold);}
+  .pillar-tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+    padding:5px 10px;border-radius:6px;margin-bottom:14px;border:1px solid;}
+  .pillar-products{color:#6db5ff;border-color:#27405e;background:#101a26;}
+  .pillar-services{color:#7ee0a3;border-color:#1f4a30;background:#0f1f16;}
+  .pillar-gov{color:#f0a35c;border-color:#5e3f1d;background:#221708;}
+
+  header.intro h1{font-size:30px;margin:0 0 10px;font-weight:700;letter-spacing:-.01em;}
+  header.intro p{margin:0;color:var(--muted);font-size:16px;max-width:760px;}
+  .persona{margin-top:14px;font-size:14.5px;color:var(--text);background:var(--wall);
+    border:1px solid var(--line);border-radius:10px;padding:12px 16px;max-width:760px;}
+  .persona b{color:var(--gold);}
+
+  /* Metrics bar */
+  .metrics{display:flex;gap:12px;flex-wrap:wrap;margin:26px 0 4px;}
+  .metric{background:var(--wall);border:1px solid var(--line);border-radius:10px;
+    padding:12px 18px;min-width:140px;}
+  .metric .label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;}
+  .metric .val{font-size:22px;font-weight:700;margin-top:3px;}
+  .metric .val .after{color:#7ee0a3;}
+  .metric .val .arrow{color:var(--muted);font-size:16px;margin:0 6px;}
+  .metric.score{border-color:#5c4d12;background:#1c1810;}
+  .metric.score .val{color:var(--gold);}
+
+  /* Legend */
+  .legend{display:flex;gap:14px;align-items:center;margin:26px 0 6px;flex-wrap:wrap;}
+  .leg{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--muted);
+       background:var(--wall);border:1px solid var(--line);padding:7px 12px;border-radius:8px;}
+  .chip{width:15px;height:15px;border-radius:3px;flex:none;}
+  .c-action{background:#5ec07e;} .c-decision{background:#5b9bd5;}
+  .c-pain{background:#e76d6d;} .c-gold{background:#f0c33c;} .c-trigger{background:#e4dcc4;}
+  .c-cost{background:#b78ee6;}
+
+  /* Stage band */
+  .stage{margin-top:40px;}
+  .stage > h2{font-size:13px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+       color:var(--muted);margin:0 0 4px;}
+  .stage > .hint{font-size:13px;color:#65656e;margin:0 0 16px;font-style:italic;}
+
+  .board{display:flex;flex-wrap:wrap;gap:14px;}
+
+  .sticky{
+    width:158px;min-height:150px;padding:15px 14px;border-radius:3px;
+    color:var(--ink);font-weight:600;font-size:14px;line-height:1.32;
+    box-shadow:0 7px 18px rgba(0,0,0,.45);
+    display:flex;flex-direction:column;
+    transition:transform .14s ease, box-shadow .14s ease;
+    position:relative;
+  }
+  .sticky .kind{font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;
+       opacity:.45;margin-bottom:9px;}
+  .sticky .note{margin-top:auto;padding-top:8px;font-size:11px;font-weight:700;opacity:.55;}
+  .sticky:hover{transform:rotate(0deg) translateY(-5px)!important;box-shadow:0 14px 28px rgba(0,0,0,.55);z-index:5;}
+  .board .sticky:nth-child(4n+1){transform:rotate(-1.6deg);}
+  .board .sticky:nth-child(4n+2){transform:rotate(1.2deg);}
+  .board .sticky:nth-child(4n+3){transform:rotate(-.7deg);}
+  .board .sticky:nth-child(4n+4){transform:rotate(1.8deg);}
+
+  .s-action{background:#5ec07e;}
+  .s-decision{background:#5b9bd5;}
+  .s-pain{background:#e76d6d;}
+  .s-gold{background:#f0c33c;}
+  .s-trigger{background:#e4dcc4;}
+  .s-cost{background:#b78ee6;}
+
+  /* Loops */
+  .loops{margin-top:54px;border-top:1px solid var(--line);padding-top:34px;}
+  .loops h2{font-size:22px;margin:0 0 6px;}
+  .loops > p{color:var(--muted);margin:0 0 22px;max-width:720px;}
+  .loop-row{display:flex;flex-wrap:wrap;gap:18px;}
+  .loop{background:var(--wall);border:1px solid var(--line);border-radius:12px;
+        padding:18px 20px;flex:1;min-width:240px;}
+  .loop .nodes{font-size:17px;font-weight:600;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .loop .arr{color:#e0584f;font-size:20px;}
+  .loop .why{color:var(--muted);font-size:13.5px;margin-top:10px;}
+
+  /* Gold takeover */
+  .takeover{margin-top:54px;border-top:1px solid var(--line);padding-top:34px;}
+  .takeover h2{font-size:22px;margin:0 0 6px;}
+  .takeover > p{color:var(--muted);margin:0 0 22px;max-width:740px;}
+
+  /* The ailb flow — the collapsed A-Z */
+  .ailb-flow{margin-top:54px;border-top:1px solid var(--line);padding-top:34px;}
+  .ailb-flow h2{font-size:22px;margin:0 0 6px;}
+  .ailb-flow h2 .brand{color:var(--gold);}
+  .ailb-flow > p{color:var(--muted);margin:0 0 22px;max-width:740px;}
+  .flow-steps{display:flex;flex-wrap:wrap;gap:0;align-items:stretch;}
+  .flow-step{background:#10180f;border:1px solid #2a4a28;border-radius:12px;
+    padding:16px 18px;width:215px;position:relative;}
+  .flow-step .n{font-size:11px;font-weight:800;color:#7ee0a3;letter-spacing:.1em;margin-bottom:7px;}
+  .flow-step .t{font-weight:700;font-size:15px;}
+  .flow-step .d{color:var(--muted);font-size:13px;margin-top:6px;}
+  .flow-arrow{align-self:center;color:#7ee0a3;font-size:22px;padding:0 10px;}
+
+  /* Verdict */
+  .verdict{margin-top:54px;border:1px solid #5c4d12;background:#1c1810;border-radius:14px;padding:24px 26px;}
+  .verdict h2{margin:0 0 8px;font-size:20px;color:var(--gold);}
+  .verdict .scores{display:flex;gap:20px;flex-wrap:wrap;margin:14px 0;}
+  .verdict .sc{font-size:13.5px;color:var(--muted);}
+  .verdict .sc b{color:var(--text);font-size:17px;display:block;}
+  .verdict p{margin:8px 0 0;color:var(--text);font-size:15px;max-width:820px;}
+
+  @media(max-width:520px){ .sticky{width:calc(50% - 7px);} .flow-step{width:100%;} .flow-arrow{display:none;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="crumb"><a href="index.html">← all 15 maps</a></p>
+  <span class="pillar-tag pillar-services">SERVICE MARKETPLACE</span>
+
+  <header class="intro">
+    <h1>Hiring home repair — reality map</h1>
+    <p>Not a process diagram — a wall of what the person actually experiences, A to Z. One sticky = one thought, decision, action, problem, or cost. Color reveals where ailb deletes, simplifies, or takes over.</p>
+    <div class="persona"><b>Rana, 38, Achrafieh</b> — the water heater died Friday night, her husband is in Dubai for two weeks, and the natour "knows a guy" who knows a guy.</div>
+  </header>
+
+  <!-- METRICS: today vs with ailb -->
+  <div class="metrics">
+    <div class="metric"><div class="label">Steps</div><div class="val">19<span class="arrow">→</span><span class="after">2</span></div></div>
+    <div class="metric"><div class="label">Time</div><div class="val">~8 days<span class="arrow">→</span><span class="after">~24 h</span></div></div>
+    <div class="metric"><div class="label">Days stuck home</div><div class="val">3<span class="arrow">→</span><span class="after">1</span></div></div>
+    <div class="metric"><div class="label">Pain points</div><div class="val">15<span class="arrow">→</span><span class="after">2</span></div></div>
+    <div class="metric score"><div class="label">Disruption score</div><div class="val">7.8 / 10</div></div>
+  </div>
+
+  <div class="legend">
+    <div class="leg"><span class="chip c-trigger"></span>Trigger / thought</div>
+    <div class="leg"><span class="chip c-action"></span>Action — a thing I do</div>
+    <div class="leg"><span class="chip c-decision"></span>Decision — a choice I make</div>
+    <div class="leg"><span class="chip c-pain"></span>Pain point / fear</div>
+    <div class="leg"><span class="chip c-cost"></span>Cost / fee / waiting</div>
+    <div class="leg"><span class="chip c-gold"></span>ailb takeover opportunity</div>
+  </div>
+
+  <div class="stage">
+    <h2>Something breaks</h2>
+    <p class="hint">It's never a convenient thing, and it's never a convenient time.</p>
+    <div class="board">
+      <div class="sticky s-trigger"><span class="kind">trigger</span>Water heater died. Cold shower in February.</div>
+      <div class="sticky s-trigger"><span class="kind">trigger</span>AC gave up and it's August in Beirut</div>
+      <div class="sticky s-trigger"><span class="kind">trigger</span>Brown stain spreading on the ceiling — leak from upstairs?</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>Is this urgent-urgent, or can it wait till payday?</div>
+      <div class="sticky s-decision"><span class="kind">decision</span>Do I try to fix it myself first?</div>
+      <div class="sticky s-action"><span class="kind">action</span>YouTube the problem. Open the panel. Close the panel.<span class="note">~40 min, made it worse</span></div>
+    </div>
+  </div>
+
+  <div class="stage">
+    <h2>The hunt for "a guy"</h2>
+    <p class="hint">There is no directory. There are only people who know people.</p>
+    <div class="board">
+      <div class="sticky s-action"><span class="kind">action</span>Ask the natour if he "knows someone"</div>
+      <div class="sticky s-action"><span class="kind">action</span>Post in the family WhatsApp group: "had 3ando kahrabje mni7?"</div>
+      <div class="sticky s-action"><span class="kind">action</span>Search the FB recommendations groups<span class="note">~45 min scrolling</span></div>
+      <div class="sticky s-pain"><span class="kind">pain</span>40 comments, 12 different numbers, every one "the best in Beirut"</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>Half the recommendations are someone's cousin</div>
+      <div class="sticky s-decision"><span class="kind">decision</span>The natour's guy or Aunt Mona's guy?</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>No reviews, no photos of past work. Just "trust me, byaaref shou 3am ya3mol"</div>
+      <div class="sticky s-action"><span class="kind">action</span>Save 5 numbers as "Plumber FB 1", "Plumber FB 2"…</div>
+      <div class="sticky s-cost"><span class="kind">cost</span>Two days gone and I haven't even called anyone yet<span class="note">~2 days</span></div>
+      <div class="sticky s-gold"><span class="kind">ailb takeover</span>ailb diagnoses the problem from a photo of the heater</div>
+    </div>
+  </div>
+
+  <div class="stage">
+    <h2>Making contact</h2>
+    <p class="hint">Phone tag with people whose office is their pocket.</p>
+    <div class="board">
+      <div class="sticky s-action"><span class="kind">action</span>Call number 1 — no answer. Call again. No answer.</div>
+      <div class="sticky s-action"><span class="kind">action</span>Call number 2 — "off service". He changed numbers, apparently.</div>
+      <div class="sticky s-action"><span class="kind">action</span>WhatsApp number 3, get a voice note back<span class="note">3 hours later</span></div>
+      <div class="sticky s-pain"><span class="kind">pain</span>"Bkam?" — "lezem shoufa." Nobody prices anything unseen.</div>
+      <div class="sticky s-decision"><span class="kind">decision</span>Send him a video of the problem? He says he still has to come.</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>The visit to give a quote is itself an appointment I have to win</div>
+      <div class="sticky s-cost"><span class="kind">cost</span>A day and a half of phone tag<span class="note">~1.5 days</span></div>
+      <div class="sticky s-gold"><span class="kind">ailb takeover</span>ailb gets fixed quotes from vetted pros using my photo — no visit</div>
+    </div>
+  </div>
+
+  <div class="stage">
+    <h2>The waiting</h2>
+    <p class="hint">"Ba3d el dohor" is a window of time that extends to never.</p>
+    <div class="board">
+      <div class="sticky s-action"><span class="kind">action</span>He says "bukra ba3d el dohor" — I block the whole afternoon<span class="note">half day hostage</span></div>
+      <div class="sticky s-pain"><span class="kind">pain</span>4pm. Nothing. "Wenak?" — "3a tariq."</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>6pm. He's not coming. No call, no apology.</div>
+      <div class="sticky s-action"><span class="kind">action</span>Reschedule for Saturday — cancel my actual plans<span class="note">full day lost</span></div>
+      <div class="sticky s-decision"><span class="kind">decision</span>Keep waiting for this one, or start over with FB number 4?</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>One week without hot water now. Heating pots like it's 1990.</div>
+      <div class="sticky s-cost"><span class="kind">cost</span>Two full days waiting at home for someone who maybe comes<span class="note">2 days, $0 earned</span></div>
+      <div class="sticky s-gold"><span class="kind">ailb takeover</span>ailb confirms a real slot and tracks the pro's live ETA</div>
+    </div>
+  </div>
+
+  <div class="stage">
+    <h2>The visit &amp; the work</h2>
+    <p class="hint">The price is a function of your building's marble, not the broken part.</p>
+    <div class="board">
+      <div class="sticky s-action"><span class="kind">action</span>He finally shows up. Looks at the heater for 5 minutes.</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>The quote doubles once he's seen the lobby — "hay sha8le kbire"</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>Is $120 fair or robbery? I genuinely have no reference point.</div>
+      <div class="sticky s-decision"><span class="kind">decision</span>Negotiate, or just pay to make it end?</div>
+      <div class="sticky s-action"><span class="kind">action</span>He needs a part — "berja3 bukra." Disappears for two days.</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>Is the part new or pulled from someone else's dead heater? No receipt.</div>
+      <div class="sticky s-action"><span class="kind">action</span>Withdraw fresh dollars — he won't take lira at any sane rate</div>
+      <div class="sticky s-cost"><span class="kind">cost</span>$120 labor + $30 mystery part, cash<span class="note">~$150 cash USD</span></div>
+      <div class="sticky s-gold"><span class="kind">ailb takeover</span>ailb fixes the quote before anyone enters my house</div>
+    </div>
+  </div>
+
+  <div class="stage">
+    <h2>Aftermath</h2>
+    <p class="hint">The warranty is a feeling.</p>
+    <div class="board">
+      <div class="sticky s-trigger"><span class="kind">trigger</span>It works! …for now.</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>Drips again after 10 days — now HE doesn't answer MY calls</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>No invoice, no warranty, no recourse. Complain to whom?</div>
+      <div class="sticky s-action"><span class="kind">action</span>Save his number as "Heater guy GOOD?" for next time</div>
+      <div class="sticky s-pain"><span class="kind">pain</span>Lost the actually-good electrician's number when my phone died in 2023</div>
+      <div class="sticky s-gold"><span class="kind">ailb takeover</span>ailb follows up after the job and holds the warranty</div>
+      <div class="sticky s-gold"><span class="kind">ailb takeover</span>ailb remembers every pro who ever touched my house</div>
+    </div>
+  </div>
+
+  <!-- LOOPS -->
+  <div class="loops">
+    <h2>It's not linear — it loops</h2>
+    <p>Draw the arrows and the "process" collapses into a few tight feedback loops. These are where people get stuck, re-decide, and abandon.</p>
+    <div class="loop-row">
+      <div class="loop">
+        <div class="nodes">Call <span class="arr">↔</span> No answer <span class="arr">↔</span> Back to the FB thread</div>
+        <div class="why">The number carousel. Each dead number sends you back to fishing for new numbers — and the new ones don't answer either.</div>
+      </div>
+      <div class="loop">
+        <div class="nodes">"Bukra ba3d el dohor" <span class="arr">↔</span> No-show <span class="arr">↔</span> Reschedule</div>
+        <div class="why">The waiting loop. You burn a day at home, he doesn't come, and your only move is to offer him another of your days.</div>
+      </div>
+      <div class="loop">
+        <div class="nodes">Unknown price <span class="arr">↔</span> Unknown quality</div>
+        <div class="why">You can't compare quotes without visits, and you can't afford the days visits cost — so you accept the first human who actually shows up. That's not a choice, it's surrender.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAKEOVER -->
+  <div class="takeover">
+    <h2>Where ailb takes over (gold)</h2>
+    <p>The strongest opportunities aren't the happy-path clicks — they're the things people genuinely don't want to do.</p>
+    <div class="board">
+      <div class="sticky s-gold"><span class="kind">gold</span>Diagnose from a photo / video before anyone moves</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Match a vetted pro — track record, not a cousin's opinion</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Fixed quote upfront — the lobby marble changes nothing</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Benchmark the price: "$120 is fair for this job in Beirut"</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Real scheduling + live ETA — no more hostage afternoons</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Auto-dispatch a backup pro if he no-shows</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Follow up at day 10 — hold the warranty so he answers</div>
+      <div class="sticky s-gold"><span class="kind">gold</span>Keep my home's full repair history and the good pros' numbers</div>
+    </div>
+  </div>
+
+  <!-- THE AILB FLOW -->
+  <div class="ailb-flow">
+    <h2>The <span class="brand">ailb</span> flow — same outcome, 5 steps</h2>
+    <p>What survives after delete → simplify → automate. The human only does what only the human can do.</p>
+    <div class="flow-steps">
+      <div class="flow-step"><div class="n">STEP 1</div><div class="t">Send a photo</div><div class="d">You WhatsApp ailb a photo or video of the dead heater. That's your whole job.</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">STEP 2</div><div class="t">Agent diagnoses</div><div class="d">The agent identifies the likely failure, parts needed, and the fair price range — and tells you if it's DIY-able.</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">STEP 3</div><div class="t">Agent dispatches</div><div class="d">A vetted pro accepts a fixed quote and a confirmed slot. Hunting, calling, haggling: deleted.</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">STEP 4</div><div class="t">You open the door</div><div class="d">The one irreducibly physical moment. ETA tracked; backup auto-dispatched on a no-show.</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">STEP 5</div><div class="t">Agent closes the loop</div><div class="d">Payment record, warranty held, day-10 follow-up. If it drips again, the agent chases him — not you.</div></div>
+    </div>
+  </div>
+
+  <!-- VERDICT -->
+  <div class="verdict">
+    <h2>Verdict — should ailb disrupt this?</h2>
+    <div class="scores">
+      <div class="sc"><b>9/10</b>Pain density</div>
+      <div class="sc"><b>7/10</b>AI collapse ratio</div>
+      <div class="sc"><b>8/10</b>Frequency × market</div>
+      <div class="sc"><b>7/10</b>Demo feasibility by Saturday</div>
+    </div>
+    <p>The map is nearly all red: every step between "it broke" and "it's fixed" is search, phone tag, waiting, and price anxiety — none of it is the repair itself. The photo-diagnosis + fixed-quote + dispatch chain deletes almost everything except the visit, and photo diagnosis alone is a jaw-drop demo moment that needs zero real supply. <b>Recommendation: hackathon demo flow</b> — demo the diagnose→quote→dispatch conversation with 2–3 seeded pros.</p>
+  </div>
+
+</div>
+</body>
+</html>
